@@ -1,6 +1,6 @@
 from dash import callback, html, Output, Input, State, no_update, dcc, ALL
 import pandas as pd
-from src.widgets import chart, dataset_selection
+from src.widgets import chart, dataset_selection, ohls_chart
 from cleanlab_studio import Studio
 import os
 from dotenv import load_dotenv
@@ -8,6 +8,7 @@ import dash
 import matplotlib.pyplot as plt
 import io
 import base64
+import random
 
 # Load environment variables from .env file
 load_dotenv()
@@ -137,3 +138,23 @@ def handle_callbacks(dataset_value, save_n_clicks, submit_n_clicks, delete_n_cli
         new_deleted_history = []
 
     return no_update, no_update, new_answer_input_value, new_combined_history, new_initial_chart_store, new_full_history, new_deleted_history
+
+@callback(
+    Output('ohls-chart', 'children'),
+    Input('save-button', 'n_clicks'),
+    State('initial-chart-store', 'data'),
+    prevent_initial_call=True
+)
+def update_ohlc_chart(save_n_clicks, initial_chart_present):
+    if save_n_clicks > 0:
+        random_number = random.randint(1, 100)
+        chart_data = pd.DataFrame({
+            'Date': pd.date_range(start='2023-01-01', periods=30, freq='D'),
+            'Open': [random.randint(25, 35) for _ in range(30)],
+            'High': [random.randint(30, 40) for _ in range(30)],
+            'Low': [random.randint(20, 30) for _ in range(30)],
+            'Close': [random.randint(25, 35) for _ in range(30)]
+        })
+        new_ohls_chart = ohls_chart.create_ohlc_chart(chart_data)
+        return new_ohls_chart
+    return no_update

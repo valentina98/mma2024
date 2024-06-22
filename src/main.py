@@ -86,7 +86,7 @@ def run_ui():
             ], fluid=True)
         ]),
         dcc.Tab(label='(Un)certainty Chart', children=[
-            html.Div(ohls_chart_widget, style={'display': 'flex', 'justify-content': 'center', 'align-items': 'center', 'height': '100%'})
+            html.Div(id='ohls-chart', children=[ohls_chart_widget], style={'display': 'flex', 'justify-content': 'center', 'align-items': 'center', 'height': '100%'})
         ]),
     ], style={'marginBottom': '20px'})
 
