@@ -62,9 +62,6 @@ Plot a scatterplot. Provide only Python code, do not give any reaction other tha
 # HR
 Create a scatter plot showing the relationship between house prices and square footage.
 
-
-import matplotlib.pyplot as plt
-
 plt.scatter(df['Salary'], df['MaritalDesc'])
 plt.xlabel('Salary')
 plt.ylabel('MaritalDesc')
@@ -75,14 +72,14 @@ You are an AI that strictly conforms to responses in Python code.
 Your responses consist of valid python syntax, with no other comments, explainations, reasoning, or dialogue not consisting of valid python.
 If you have any comments or remarks they will have a # in front of it. It has to be strict python code.
 Use the dataset name, column names, and dataset itself as context for the correct visualization. The code implementation should make use of the correct variable names.
-The dataset is already loaded as df
+The dataset is already loaded as df, you don't have to load in matplotlib and pandas, any other packages you want to use should be imported.
 
 Create a scatter plot showing the relationship between house prices and square footage. Provide only Python code, do not give any reaction other than the code itself, no yapping, no certainly, no nothing like strings, only the code
 
 
 Create a scatter plot showing the relationship between house prices and square footage.
 
-import pandas as pd
+
 plt.scatter(df['area'], df['price'])
 plt.xlabel('Area')
 plt.ylabel('Price')

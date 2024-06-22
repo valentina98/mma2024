@@ -41,6 +41,8 @@ def run_ui():
     answer_widget = dcc.Textarea(id='answer-input', style={'width': '100%', 'height': 100}, placeholder='Answer will be displayed here...')
     score_store = dcc.Store(id='score-store')
     initial_chart_store = dcc.Store(id='initial-chart-store', data=True)  # Store to track if the initial chart is present
+    full_history_store = dcc.Store(id='full-history-store', data=[])  # Store to keep track of the full history
+    deleted_history_store = dcc.Store(id='deleted-history-store', data=[])  # Store to keep track of deleted entries
 
     initial_chart = chart.create_chart(code, 'Housing')  # Provide the dataset name
     help_popup_widget = help_popup.create_help_popup()
@@ -49,7 +51,8 @@ def run_ui():
     initial_prompt = html.P("Initial Prompt", style={'text-align': 'center'})
     initial_entry = html.Div([
         html.Div([initial_prompt], style={'flex': '1', 'padding': '10px'}),
-        html.Div([initial_chart], style={'flex': '1', 'padding': '10px'})
+        html.Div([initial_chart], style={'flex': '1', 'padding': '10px'}),
+        html.Button('Delete', id={'type': 'delete-button', 'index': 0}, n_clicks=0)
     ], style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center'})
 
     tabs = dcc.Tabs([
@@ -75,7 +78,11 @@ def run_ui():
                     dbc.Col(html.Div(id='combined-history', children=[
                         initial_entry
                     ], style={'height': '500px', 'overflow': 'auto'}), width=12)
-                ])
+                ]),
+                dbc.Row([
+                    dbc.Col(dbc.Button('Clear History', id='clear-history-button', color='danger'), width='auto'),
+                    dbc.Col(dbc.Button('Restore History', id='restore-history-button', color='secondary'), width='auto')
+                ], justify='center', style={'marginTop': '20px'})
             ], fluid=True)
         ]),
         dcc.Tab(label='(Un)certainty Chart', children=[
@@ -86,7 +93,9 @@ def run_ui():
     app.layout = dbc.Container([
         help_popup_widget,
         tabs,
-        initial_chart_store
+        initial_chart_store,
+        full_history_store,
+        deleted_history_store
     ], fluid=True, id='container')
 
     app.run_server(debug=True, use_reloader=False)
