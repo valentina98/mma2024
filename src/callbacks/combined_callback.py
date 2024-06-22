@@ -120,6 +120,8 @@ def handle_callbacks(dataset_value, save_n_clicks, submit_n_clicks, delete_n_cli
         index = int(triggered_id.split(':')[1].split(',')[0])
         deleted_entry = new_combined_history.pop(len(new_combined_history) - 1 - index)
         new_deleted_history.append(deleted_entry)
+        if initial_chart_present and not new_combined_history:
+            new_initial_chart_store = True
 
     # Handle clear history button
     if triggered_id == 'clear-history-button' and clear_n_clicks > 0:
@@ -128,7 +130,10 @@ def handle_callbacks(dataset_value, save_n_clicks, submit_n_clicks, delete_n_cli
 
     # Handle restore history button
     if triggered_id == 'restore-history-button' and restore_n_clicks > 0:
-        new_combined_history = new_full_history
+        if not full_history:
+            new_combined_history = new_deleted_history
+        else:
+            new_combined_history = new_full_history + new_deleted_history
         new_deleted_history = []
 
     return no_update, no_update, new_answer_input_value, new_combined_history, new_initial_chart_store, new_full_history, new_deleted_history
