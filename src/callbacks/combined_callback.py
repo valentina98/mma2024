@@ -32,7 +32,8 @@ def get_dataset_path(dataset_name):
      Output('combined-history', 'children'),
      Output('initial-chart-store', 'data'),
      Output('full-history-store', 'data'),
-     Output('deleted-history-store', 'data')],
+     Output('deleted-history-store', 'data'),
+     Output('ohls-chart', 'children')],
     [Input('dataset-dropdown', 'value'),
      Input('save-button', 'n_clicks'),
      Input('submit-button', 'n_clicks'),
@@ -53,7 +54,7 @@ def handle_callbacks(dataset_value, save_n_clicks, submit_n_clicks, delete_n_cli
     
     ctx = dash.callback_context
     if not ctx.triggered:
-        return no_update, no_update, no_update, no_update, no_update, no_update, no_update
+        return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
 
     triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
@@ -62,26 +63,39 @@ def handle_callbacks(dataset_value, save_n_clicks, submit_n_clicks, delete_n_cli
     new_initial_chart_store = initial_chart_present
     new_full_history = full_history
     new_deleted_history = deleted_history
+    new_ohlc_chart = no_update
 
     # Handle dataset dropdown
     if triggered_id == 'dataset-dropdown' and dataset_value:
         data_path = get_dataset_path(dataset_value)
         if os.path.exists(data_path):
             data = pd.read_csv(data_path)
-            return dataset_selection.create_table(data), dataset_value, no_update, no_update, no_update, no_update, no_update
+            return dataset_selection.create_table(data), dataset_value, no_update, no_update, no_update, no_update, no_update, no_update
         else:
-            return f"Dataset {dataset_value} not found.", "", no_update, no_update, no_update, no_update, no_update
+            return f"Dataset {dataset_value} not found.", "", no_update, no_update, no_update, no_update, no_update, no_update
 
     # Handle save button
-    if triggered_id == 'save-button' and save_n_clicks > 0 and prompt_value and selected_dataset_store:
-        data_path = get_dataset_path(selected_dataset_store)
-        if os.path.exists(data_path):
-            df = pd.read_csv(data_path)
-            column_names = ", ".join(df.columns)
-            first_two_rows = df.head(2).to_string(index=False)
-            modified_prompt = f"Dataset: {selected_dataset_store}\n\nDataset columns: {column_names}\n\nFirst two rows:\n{first_two_rows}\n\nPrompt: {prompt_value}"
-            response = tlm.prompt(modified_prompt)
-            new_answer_input_value = response["response"]
+    if triggered_id == 'save-button' and save_n_clicks > 0:
+        if prompt_value and selected_dataset_store:
+            data_path = get_dataset_path(selected_dataset_store)
+            if os.path.exists(data_path):
+                df = pd.read_csv(data_path)
+                column_names = ", ".join(df.columns)
+                first_two_rows = df.head(2).to_string(index=False)
+                modified_prompt = f"Dataset: {selected_dataset_store}\n\nDataset columns: {column_names}\n\nFirst two rows:\n{first_two_rows}\n\nPrompt: {prompt_value}"
+                response = tlm.prompt(modified_prompt)
+                new_answer_input_value = response["response"]
+
+        # Update OHLC chart
+        random_number = random.randint(1, 100)
+        chart_data = pd.DataFrame({
+            'Iteration': pd.date_range(start='2023-01-01', periods=30, freq='D'),
+            'Certainty Prompt': [random.randint(25, 35) for _ in range(30)],
+            'Highest Suggested Certainty': [random.randint(30, 40) for _ in range(30)],
+            'Lowest Suggested Certainty': [random.randint(20, 30) for _ in range(30)],
+            # 'Close': [random.randint(25, 35) for _ in range(30)]
+        })
+        new_ohlc_chart = ohls_chart.create_ohlc_chart(chart_data)
 
     # Handle submit button
     if triggered_id == 'submit-button' and submit_n_clicks > 0 and answer_input_value and selected_dataset_store:
@@ -112,9 +126,9 @@ def handle_callbacks(dataset_value, save_n_clicks, submit_n_clicks, delete_n_cli
                     new_combined_history = [new_entry] + history_children
                     new_full_history = [new_entry] + full_history
             except Exception as e:
-                return no_update, no_update, no_update, [html.Div(f"An error occurred while plotting the chart: {str(e)}")] + history_children, no_update, no_update, no_update
+                return no_update, no_update, no_update, [html.Div(f"An error occurred while plotting the chart: {str(e)}")] + history_children, no_update, no_update, no_update, no_update
         else:
-            return no_update, no_update, no_update, [html.Div(f"Dataset {selected_dataset_store} not found.")] + history_children, no_update, no_update, no_update
+            return no_update, no_update, no_update, [html.Div(f"Dataset {selected_dataset_store} not found.")] + history_children, no_update, no_update, no_update, no_update
 
     # Handle delete button
     if 'delete-button' in triggered_id:
@@ -137,24 +151,4 @@ def handle_callbacks(dataset_value, save_n_clicks, submit_n_clicks, delete_n_cli
             new_combined_history = new_full_history + new_deleted_history
         new_deleted_history = []
 
-    return no_update, no_update, new_answer_input_value, new_combined_history, new_initial_chart_store, new_full_history, new_deleted_history
-
-@callback(
-    Output('ohls-chart', 'children'),
-    Input('save-button', 'n_clicks'),
-    State('initial-chart-store', 'data'),
-    prevent_initial_call=True
-)
-def update_ohlc_chart(save_n_clicks, initial_chart_present):
-    if save_n_clicks > 0:
-        random_number = random.randint(1, 100)
-        chart_data = pd.DataFrame({
-            'Date': pd.date_range(start='2023-01-01', periods=30, freq='D'),
-            'Open': [random.randint(25, 35) for _ in range(30)],
-            'High': [random.randint(30, 40) for _ in range(30)],
-            'Low': [random.randint(20, 30) for _ in range(30)],
-            'Close': [random.randint(25, 35) for _ in range(30)]
-        })
-        new_ohls_chart = ohls_chart.create_ohlc_chart(chart_data)
-        return new_ohls_chart
-    return no_update
+    return no_update, no_update, new_answer_input_value, new_combined_history, new_initial_chart_store, new_full_history, new_deleted_history, new_ohlc_chart
