@@ -45,6 +45,12 @@ def run_ui():
     help_popup_widget = help_popup.create_help_popup()
     ohls_chart_widget = ohls_chart.create_ohlc_chart(chart_data)
 
+    initial_prompt = html.P("Initial Prompt", style={'text-align': 'center'})
+    initial_entry = html.Div([
+        html.Div([initial_prompt], style={'flex': '1', 'padding': '10px'}),
+        html.Div([initial_chart], style={'flex': '1', 'padding': '10px'})
+    ], style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center'})
+
     tabs = dcc.Tabs([
         dcc.Tab(label='Dataset Selection', children=[
             dataset_selection.create_dataset_selection()
@@ -63,10 +69,11 @@ def run_ui():
             ], fluid=True)
         ]),
         dcc.Tab(label='Visualization History', children=[
-            dbc.Container([
+            dbc.Container(id='history-container', children=[
                 dbc.Row([
-                    dbc.Col(html.Div(id='old-chart-div', children=[initial_chart], style={'height': '500px', 'overflow': 'auto'}), width=6),
-                    dbc.Col(html.Div(id='new-chart-div', children=[], style={'height': '500px', 'overflow': 'auto'}), width=6)
+                    dbc.Col(html.Div(id='combined-history', children=[
+                        initial_entry
+                    ], style={'height': '500px', 'overflow': 'auto'}), width=12)
                 ])
             ], fluid=True)
         ]),

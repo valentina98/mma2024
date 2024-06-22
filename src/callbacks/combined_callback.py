@@ -52,39 +52,46 @@ def save_prompt(n_clicks, prompt, selected_dataset_store):
         data_path = get_dataset_path(selected_dataset_store)
         if os.path.exists(data_path):
             df = pd.read_csv(data_path)
-            #give the first 2 rows of the dataset as context
-            modified_prompt = f"Dataset: {selected_dataset_store}\n\nContext: {df.head(2).to_string(index=False)}\n\nPrompt: {prompt}"
+            column_names = ", ".join(df.columns)
+            first_two_rows = df.head(2).to_string(index=False)
+            modified_prompt = f"Dataset: {selected_dataset_store}\n\nDataset columns: {column_names}\n\nFirst two rows:\n{first_two_rows}\n\nPrompt: {prompt}"
             response = tlm.prompt(modified_prompt)
             return response["response"]
     return ""
 
 @callback(
-    [Output('old-chart-div', 'children'),
-     Output('new-chart-div', 'children')],
+    Output('combined-history', 'children'),
     Input('submit-button', 'n_clicks'),
     State('answer-input', 'value'),
-    State('new-chart-div', 'children'),
+    State('combined-history', 'children'),
+    State('prompt-input', 'value'),
     State('selected-dataset-store', 'data'),
     prevent_initial_call=True
 )
-def update_chart(n_clicks, answer_code, current_new_chart, selected_dataset):
+def update_chart(n_clicks, answer_code, history_children, prompt, selected_dataset):
     if n_clicks > 0 and answer_code and selected_dataset:
         data_path = get_dataset_path(selected_dataset)
         if os.path.exists(data_path):
             data = pd.read_csv(data_path)
             try:
                 modified_code = answer_code.replace("housing", "df")
-                exec(modified_code, {'df': data, 'plt': plt})
-                
+                exec(modified_code, {'df': data, 'plt': plt, 'pd': pd})
+
                 buf = io.BytesIO()
                 plt.savefig(buf, format='png')
                 buf.seek(0)
                 image_base64 = base64.b64encode(buf.read()).decode('utf-8')
                 plt.close()
+
+                new_prompt_div = html.Div([html.P(prompt, style={'text-align': 'center'})], style={'flex': '1', 'padding': '10px'})
+                new_chart_div = html.Div([html.Img(src=f'data:image/png;base64,{image_base64}')], style={'flex': '1', 'padding': '10px'})
                 
-                return current_new_chart, [html.Img(src=f'data:image/png;base64,{image_base64}')]
+                new_entry = html.Div([new_prompt_div, new_chart_div], style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center'})
+                new_history_children = [new_entry] + history_children
+
+                return new_history_children
             except Exception as e:
-                return no_update, [f"An error occurred while plotting the chart: {str(e)}"]
+                return [html.Div(f"An error occurred while plotting the chart: {str(e)}")] + history_children
         else:
-            return no_update, [f"Dataset {selected_dataset} not found."]
-    return no_update, no_update
+            return [html.Div(f"Dataset {selected_dataset} not found.")] + history_children
+    return no_update
