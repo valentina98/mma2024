@@ -60,15 +60,17 @@ def save_prompt(n_clicks, prompt, selected_dataset_store):
     return ""
 
 @callback(
-    Output('combined-history', 'children'),
+    [Output('combined-history', 'children'),
+     Output('initial-chart-store', 'data')],
     Input('submit-button', 'n_clicks'),
     State('answer-input', 'value'),
     State('combined-history', 'children'),
     State('prompt-input', 'value'),
     State('selected-dataset-store', 'data'),
+    State('initial-chart-store', 'data'),
     prevent_initial_call=True
 )
-def update_chart(n_clicks, answer_code, history_children, prompt, selected_dataset):
+def update_chart(n_clicks, answer_code, history_children, prompt, selected_dataset, initial_chart_present):
     if n_clicks > 0 and answer_code and selected_dataset:
         data_path = get_dataset_path(selected_dataset)
         if os.path.exists(data_path):
@@ -87,11 +89,16 @@ def update_chart(n_clicks, answer_code, history_children, prompt, selected_datas
                 new_chart_div = html.Div([html.Img(src=f'data:image/png;base64,{image_base64}')], style={'flex': '1', 'padding': '10px'})
                 
                 new_entry = html.Div([new_prompt_div, new_chart_div], style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center'})
-                new_history_children = [new_entry] + history_children
+                
+                if initial_chart_present:
+                    new_history_children = [new_entry]
+                    initial_chart_present = False  # Set the flag to False after removing the initial entry
+                else:
+                    new_history_children = [new_entry] + history_children
 
-                return new_history_children
+                return new_history_children, initial_chart_present
             except Exception as e:
-                return [html.Div(f"An error occurred while plotting the chart: {str(e)}")] + history_children
+                return [html.Div(f"An error occurred while plotting the chart: {str(e)}")] + history_children, initial_chart_present
         else:
-            return [html.Div(f"Dataset {selected_dataset} not found.")] + history_children
-    return no_update
+            return [html.Div(f"Dataset {selected_dataset} not found.")] + history_children, initial_chart_present
+    return no_update, initial_chart_present

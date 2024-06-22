@@ -40,6 +40,7 @@ def run_ui():
     prompt_input = dcc.Textarea(id='prompt-input', style={'width': '100%', 'height': 100}, placeholder='Enter your prompt here...')
     answer_widget = dcc.Textarea(id='answer-input', style={'width': '100%', 'height': 100}, placeholder='Answer will be displayed here...')
     score_store = dcc.Store(id='score-store')
+    initial_chart_store = dcc.Store(id='initial-chart-store', data=True)  # Store to track if the initial chart is present
 
     initial_chart = chart.create_chart(code, 'Housing')  # Provide the dataset name
     help_popup_widget = help_popup.create_help_popup()
@@ -85,6 +86,7 @@ def run_ui():
     app.layout = dbc.Container([
         help_popup_widget,
         tabs,
+        initial_chart_store
     ], fluid=True, id='container')
 
     app.run_server(debug=True, use_reloader=False)
