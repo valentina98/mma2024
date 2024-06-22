@@ -62,6 +62,14 @@ Plot a scatterplot. Provide only Python code, do not give any reaction other tha
 # HR
 Create a scatter plot showing the relationship between house prices and square footage.
 
+
+import matplotlib.pyplot as plt
+
+plt.scatter(df['Salary'], df['MaritalDesc'])
+plt.xlabel('Salary')
+plt.ylabel('MaritalDesc')
+plt.show()
+
 # Houseprices
 You are an AI that strictly conforms to responses in Python code. 
 Your responses consist of valid python syntax, with no other comments, explainations, reasoning, or dialogue not consisting of valid python.
@@ -73,6 +81,12 @@ Create a scatter plot showing the relationship between house prices and square f
 
 
 Create a scatter plot showing the relationship between house prices and square footage.
+
+import pandas as pd
+plt.scatter(df['area'], df['price'])
+plt.xlabel('Area')
+plt.ylabel('Price')
+plt.show()
 
 # Campus recruitment
 Create a histogram showing the distribution of student scores in the dataset.

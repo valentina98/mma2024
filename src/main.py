@@ -49,7 +49,7 @@ def run_ui():
         dcc.Tab(label='Dataset Selection', children=[
             dataset_selection.create_dataset_selection()
         ]),
-        dcc.Tab(label='Prompt & Code', children=[
+        dcc.Tab(label='Prompt Engineering', children=[
             dbc.Container([
                 dbc.Row([
                     dbc.Col(prompt_input, width=12),
@@ -62,7 +62,7 @@ def run_ui():
                 score_store
             ], fluid=True)
         ]),
-        dcc.Tab(label='Chart/ Visualization', children=[
+        dcc.Tab(label='Visualization History', children=[
             dbc.Container([
                 dbc.Row([
                     dbc.Col(html.Div(id='old-chart-div', children=[initial_chart], style={'height': '500px', 'overflow': 'auto'}), width=6),
@@ -70,7 +70,7 @@ def run_ui():
                 ])
             ], fluid=True)
         ]),
-        dcc.Tab(label='Uncertainty Chart', children=[
+        dcc.Tab(label='(Un)certainty Chart', children=[
             html.Div(ohls_chart_widget, style={'display': 'flex', 'justify-content': 'center', 'align-items': 'center', 'height': '100%'})
         ]),
     ], style={'marginBottom': '20px'})
