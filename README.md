@@ -93,3 +93,4 @@ Create a line chart showing the sales trend over time in the dataset.
 
 # Hotel bookings
 Create a bar chart showing the number of bookings per month in the dataset.
+

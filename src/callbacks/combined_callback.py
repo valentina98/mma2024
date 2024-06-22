@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import io
 import base64
 import random
+import numpy as np
+import plotly.graph_objs as go
 
 # Load environment variables from .env file
 load_dotenv()
@@ -140,21 +142,31 @@ def handle_callbacks(dataset_value, save_n_clicks, submit_n_clicks, delete_n_cli
     return no_update, no_update, new_answer_input_value, new_combined_history, new_initial_chart_store, new_full_history, new_deleted_history
 
 @callback(
-    Output('ohls-chart', 'children'),
+    Output('uncertainty-chart', 'children'),
     Input('save-button', 'n_clicks'),
-    State('initial-chart-store', 'data'),
+    State('prompt-input', 'value'),
     prevent_initial_call=True
 )
-def update_ohlc_chart(save_n_clicks, initial_chart_present):
-    if save_n_clicks > 0:
-        random_number = random.randint(1, 100)
-        chart_data = pd.DataFrame({
-            'Date': pd.date_range(start='2023-01-01', periods=30, freq='D'),
-            'Open': [random.randint(25, 35) for _ in range(30)],
-            'High': [random.randint(30, 40) for _ in range(30)],
-            'Low': [random.randint(20, 30) for _ in range(30)],
-            'Close': [random.randint(25, 35) for _ in range(30)]
-        })
-        new_ohls_chart = ohls_chart.create_ohlc_chart(chart_data)
-        return new_ohls_chart
+def update_uncertainty_chart(n_clicks, prompt_value):
+    if n_clicks > 0:
+        # Simulated LLM uncertainty scores
+        scores = {
+            'Current Prompt': np.random.rand(10),
+            'Suggestion 1': np.random.rand(10),
+            'Suggestion 2': np.random.rand(10),
+            'Suggestion 3': np.random.rand(10)
+        }
+        
+        fig = go.Figure()
+
+        for key, values in scores.items():
+            fig.add_trace(go.Scatter(x=list(range(len(values))), y=values, mode='lines', name=key))
+        
+        fig.update_layout(
+            title='Uncertainty Scores Over Time',
+            xaxis_title='Time',
+            yaxis_title='Uncertainty Score'
+        )
+
+        return dcc.Graph(figure=fig)
     return no_update

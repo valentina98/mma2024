@@ -1,7 +1,7 @@
 from dash import Dash, html, dcc
 from src import config
 from src.Dataset import Dataset
-from src.widgets import ohls_chart, help_popup, chart
+from src.widgets import help_popup, chart
 import dash_bootstrap_components as dbc
 import pandas as pd
 import src.callbacks.combined_callback  # Import the combined callback
@@ -46,7 +46,7 @@ def run_ui():
 
     initial_chart = chart.create_chart(code, 'Housing')  # Provide the dataset name
     help_popup_widget = help_popup.create_help_popup()
-    ohls_chart_widget = ohls_chart.create_ohlc_chart(chart_data)
+    # ohls_chart_widget = ohls_chart.create_ohlc_chart(chart_data)
 
     initial_prompt = html.P("Initial Prompt", style={'text-align': 'center'})
     initial_entry = html.Div([
@@ -86,7 +86,7 @@ def run_ui():
             ], fluid=True)
         ]),
         dcc.Tab(label='(Un)certainty Chart', children=[
-            html.Div(id='ohls-chart', children=[ohls_chart_widget], style={'display': 'flex', 'justify-content': 'center', 'align-items': 'center', 'height': '100%'})
+            html.Div(id='uncertainty-chart', style={'display': 'flex', 'justify-content': 'center', 'align-items': 'center', 'height': '100%'})
         ]),
     ], style={'marginBottom': '20px'})
 
