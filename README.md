@@ -93,3 +93,10 @@ Create a line chart showing the sales trend over time in the dataset.
 
 # Hotel bookings
 Create a bar chart showing the number of bookings per month in the dataset.
+
+
+
+# bugs
+there is a glitch if you press delete and then clear it duplicates the visualized thing until you press restore history twice then everything is normal again
+
+also if you press restore history before making any code or pressing delete or clear history you remove the pie chart permanently. It shouldn't be cleared when you just press restore history.
