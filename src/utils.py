@@ -6,7 +6,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import textwrap
 import plotly.graph_objects as go
-from dash import dcc, html
 from openai import OpenAI
 from cleanlab_studio import Studio
 from dotenv import load_dotenv

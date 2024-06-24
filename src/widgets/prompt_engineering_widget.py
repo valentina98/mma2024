@@ -9,7 +9,7 @@ def create_input():
                 dbc.Row([
                     dbc.Col([
                         html.Label('Prompt:', style={'fontWeight': 'bold', 'fontSize': '18px', 'display': 'inline-block'}),
-                        html.Span(f"()", id='prompt-score', style={'fontWeight': 'bold', 'margin': '10px', 'display': 'inline-block'})
+                        html.Span("", id='prompt-score', style={'fontWeight': 'bold', 'margin': '10px', 'display': 'inline-block'})
                     ], width=12),
                     dbc.Col(dcc.Loading(
                         id="loading-prompt",
@@ -63,18 +63,24 @@ def create_input():
         ]),
     ], fluid=True)
 
-def get_score(score):
+def create_score_span(score):
     # round to 3 decimal places
     score = round(score, 3)
     return html.Span(f"({score})", style={'fontWeight': 'bold', 'margin': '10px'})
 
-def get_suggestion(suggestion_prompt, index):
+def create_suggestion(suggestion_prompt, index):
     return html.Button(suggestion_prompt, id={'type': 'suggestion-button', 'index': index}, n_clicks=0, style={
         'margin': '5px', 'borderRadius': '10px', 'border': 'none', 'padding': '10px',
         'backgroundColor': '#F9F9F9', 'width': '100%', 'display': 'flex', 'alignItems': 'center'
     })
 
-def get_suggestion_chart(suggestion_code, dataset_name, index):
+def create_main_chart(code, dataset_name):
+    return dcc.Graph(id="main-chart", figure=generate_chart(code, dataset_name), style={
+        'width': '100%', 'height': 200, 'resize': 'none',
+        'padding': '10px', 'scrollbar-gutter': 'stable',
+        'color': 'gray', 'fontSize': '16px'})
+
+def create_suggestion_chart(suggestion_code, dataset_name, index):
     chart_graph = dcc.Graph(figure=generate_chart(suggestion_code, dataset_name), 
         style={'display': 'inline-block', 'width': '100px', 'height': '100px', 'marginLeft': '10px'})
     chart_div = html.Div(id={'type': 'suggestion-chart', 'index': index}, children=chart_graph, style={
@@ -85,13 +91,13 @@ def get_suggestion_chart(suggestion_code, dataset_name, index):
 def create_suggestions(suggestions, dataset_name):
     return [
         html.Div([
-            get_score(suggestion_score),
+            create_score_span(suggestion_score),
             dcc.Loading(
                 id={'type': 'loading-suggestion', 'index': i},
                 type="circle",
-                children=get_suggestion(suggestion_prompt, i),
+                children=create_suggestion(suggestion_prompt, i),
             ),
-            get_suggestion_chart(suggestion_code, dataset_name, i),
+            create_suggestion_chart(suggestion_code, dataset_name, i),
             html.Div(hidden=True, children=suggestion_code, id={'type': 'suggestion-code', 'index': i})
         ], style={
             'display': 'flex', 'alignItems': 'center', 'borderRadius': '10px', 

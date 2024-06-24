@@ -1,7 +1,8 @@
-from dash import callback, Output, Input, State, dcc, ctx, no_update
+from dash import callback, Output, Input, State, ctx, no_update
 from dash.dependencies import ALL
 from src.widgets import prompt_engineering_widget
-from utils import logger, get_code_and_suggestions, generate_chart
+from utils import logger, get_code_and_suggestions
+
 
 # Callback when the "Save" button is clicked
 @callback(
@@ -23,14 +24,11 @@ def save_clicked(n_clicks, prompt, dataset_name):
         suggestions_list = prompt_engineering_widget.create_suggestions(suggestions, dataset_name)
         
         # Generate the main chart
-        main_chart = dcc.Graph(figure=generate_chart(code, dataset_name), style={
-            'width': '100%', 'height': 200, 'resize': 'none',
-            'padding': '10px', 'scrollbar-gutter': 'stable',
-            'color': 'gray', 'fontSize': '16px'
-        })
+        main_chart = prompt_engineering_widget.create_main_chart(code, dataset_name)
         
-        return code, suggestions_list, main_chart, prompt_engineering_widget.get_score(trustworthiness_score)
+        return code, suggestions_list, main_chart, prompt_engineering_widget.create_score_span(trustworthiness_score)
     return "", "", "The chart will be displayed here...", ""
+
 
 # Callback when one of the suggestions is selected
 @callback(
