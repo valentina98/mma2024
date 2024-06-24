@@ -1,6 +1,6 @@
 from dash import html, dcc
 import dash_bootstrap_components as dbc
-from src.widgets import chart
+from src.utils import generate_chart
 
 code = '''import matplotlib.pyplot as plt
 
@@ -20,7 +20,9 @@ plt.show()
 '''
 
 def create_history_widget():
-    initial_chart = chart.create_chart(code, 'Housing')  # Provide the dataset name
+    # Create initial chart
+    # ToDo: Remove initial chart
+    initial_chart = dcc.Graph(figure=generate_chart(code, 'Housing'), style={'width': '100%', 'height': '100%', 'overflow': 'auto'}) 
     initial_prompt = html.P("Initial Prompt", style={'text-align': 'center'})
     initial_entry = html.Div([
         html.Div([initial_prompt], style={'flex': '1', 'padding': '10px'}),
