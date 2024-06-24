@@ -74,7 +74,12 @@ def get_code(prompt, df, dataset_name):
     )
 
     try: 
-        return send_prompt(openai_client if USE_OPEN_AI else tlm_client, code_prompt, 150)
+        response = send_prompt(openai_client if USE_OPEN_AI else tlm_client, code_prompt, 150)
+
+        # Match the code between ```python and ``` in the response or return the full response
+        code = response.split("```python")[1].split("```")[0].strip() if "```python" in response else response.strip()
+
+        return code
     except Exception as e:
         return e
 
@@ -103,9 +108,9 @@ def get_suggestions(prompt):
 
 def get_code_and_suggestions(prompt, dataset_name):
 
-    df = load_dataset(dataset_name)
-
     try:
+        df = load_dataset(dataset_name)
+
         code = get_code(prompt, df, dataset_name)
         logger.info(f"Code received: {code}")
 
@@ -129,19 +134,12 @@ def get_code_and_suggestions(prompt, dataset_name):
 
 def generate_chart(code_str, dataset_name):
     try:
-        data = load_dataset(dataset_name)
+        df = load_dataset(dataset_name)
 
         plt.close('all')
 
-        code_str = textwrap.dedent(code_str)
-
-        local_namespace = {
-            'pd': pd,
-            'plt': plt,
-            'data': data
-        }
-
-        exec(code_str, {}, local_namespace)
+        code_str = textwrap.dedent(code_str) # Dedent the code string to remove leading spaces (maybe not needed?)
+        exec(code_str, {'df': df, 'plt': plt, 'pd': pd})
 
         buf = io.BytesIO()
         plt.savefig(buf, format='png', bbox_inches='tight')
@@ -167,8 +165,7 @@ def generate_chart(code_str, dataset_name):
         fig.update_xaxes(visible=False, range=[0, 1])
         fig.update_yaxes(visible=False, range=[0, 1])
         fig.update_layout(
-            title="Chart",
-            margin=dict(l=0, r=0, t=40, b=0),
+            margin=dict(l=0, r=0, t=0, b=0),
             paper_bgcolor="white",
             plot_bgcolor="white"
         )
@@ -176,25 +173,33 @@ def generate_chart(code_str, dataset_name):
         return fig
 
     except Exception as e:
+        logger.exception(f"Error generating chart: {e}")
         error_message = f"An error occurred while plotting the chart: {str(e)}"
+        
+        # Wrap the error message to fit within the figure
+        wrapped_error_message = "<br>".join(textwrap.wrap(error_message, width=20))
+
         fig = go.Figure()
         fig.add_annotation(
-            text=error_message,
+            text=wrapped_error_message,
             x=0.5, y=0.5,
             xref="paper", yref="paper",
             showarrow=False,
-            font=dict(color="red", size=14)
+            font=dict(color="red", size=8),
+            align="center"
         )
+        fig.update_xaxes(visible=False, range=[0, 1])
+        fig.update_yaxes(visible=False, range=[0, 1])
         fig.update_layout(
-            title="Error",
-            margin=dict(l=0, r=0, t=40, b=0),
+            margin=dict(l=0, r=0, t=0, b=0),
             paper_bgcolor="white",
             plot_bgcolor="white"
         )
         return fig
+        
 
-def encode_image(image):
-    image_base64 = base64.b64encode(image).decode('utf-8')
-    return f'data:image/png;base64,{image_base64}'
+# def encode_image(image):
+#     image_base64 = base64.b64encode(image).decode('utf-8')
+#     return f'data:image/png;base64,{image_base64}'
 
 

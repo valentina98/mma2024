@@ -46,7 +46,7 @@ def manage_history(submit_n_clicks, delete_n_clicks, clear_n_clicks, restore_n_c
         if os.path.exists(data_path):
             data = pd.read_csv(data_path)
             try:
-                modified_code = answer_input_value.replace("housing", "df")
+                modified_code = answer_input_value.replace("housing", "df") # ToDo: do we need that
                 exec(modified_code, {'df': data, 'plt': plt, 'pd': pd})
 
                 buf = io.BytesIO()

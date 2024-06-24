@@ -1,7 +1,6 @@
 from dash import dcc, html
 import dash_bootstrap_components as dbc
-import matplotlib.pyplot as plt
-from utils import encode_image, generate_chart
+from utils import generate_chart
 
 def create_input():
     return dbc.Container([
@@ -32,16 +31,13 @@ def create_input():
                                 'border': '1px solid gray', 'scrollbar-gutter': 'stable'
                             }, placeholder='Answer will be displayed here...')
                         ), width=8),
-                    dbc.Col(dcc.Loading(
-                        id="loading-chart",
-                        type="circle",
-                        children=html.Div(
-                            'The chart will be displayed here...',
-                            id='resulting-chart', style={
-                            'width': '100%', 'height': 200, 'resize': 'none',
-                            'padding': '10px', 'scrollbar-gutter': 'stable',
-                            'color': 'gray', 'fontSize': '16px'
-                        })
+                    dbc.Col(
+                        html.Div(
+                        'The chart will be displayed here...',
+                        id='resulting-chart', style={
+                        'width': '100%', 'height': 200, 'resize': 'none',
+                        'padding': '10px', 'scrollbar-gutter': 'stable',
+                        'color': 'gray', 'fontSize': '16px'}
                     ), width=4),
                 ]),
                 dbc.Row([
@@ -82,12 +78,12 @@ def create_suggestions(suggestions, dataset_name):
     return [
         html.Div([
             get_suggestion_score(suggestion_score),
-            get_suggestion(suggestion_prompt, i),
             dcc.Loading(
-                id={'type': 'loading-suggestion-chart', 'index': i},
+                id={'type': 'loading-suggestion', 'index': i},
                 type="circle",
-                children=get_suggestion_chart(suggestion_code, dataset_name, i)
+                children=get_suggestion(suggestion_prompt, i),
             ),
+            get_suggestion_chart(suggestion_code, dataset_name, i),
             html.Div(hidden=True, children=suggestion_code, id={'type': 'suggestion-code', 'index': i})
         ], style={
             'display': 'flex', 'alignItems': 'center', 'borderRadius': '10px', 

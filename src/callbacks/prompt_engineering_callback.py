@@ -1,15 +1,13 @@
-from dash import callback, html, Output, Input, State, no_update, dcc, ctx
+from dash import callback, Output, Input, State, dcc, ctx, no_update
 from dash.dependencies import ALL
-import matplotlib.pyplot as plt
-import io
-import base64
 from src.widgets import prompt_engineering_widget
-from utils import logger, load_dataset, get_code_and_suggestions
+from utils import logger, get_code_and_suggestions, generate_chart
 
 # Callback when the "Save" button is clicked
 @callback(
     [Output('answer-input', 'value', allow_duplicate=True),
-     Output('suggestions-container', 'children')],
+     Output('suggestions-container', 'children'),
+     Output('resulting-chart', 'children')],
     Input('save-button', 'n_clicks'),
     State('prompt-input', 'value'),
     State('selected-dataset-store', 'data'),
@@ -18,15 +16,22 @@ from utils import logger, load_dataset, get_code_and_suggestions
 def save_clicked(n_clicks, prompt, dataset_name):
     logger.info(f"Handling save and suggestions for prompt: {prompt}, n_clicks: {n_clicks}, selected_dataset_store: {dataset_name}")
     if n_clicks > 0 and prompt and dataset_name:
-                
         code, trustworthiness_score, suggestions = get_code_and_suggestions(prompt, dataset_name)
 
         # Generate suggestions and charts
         suggestions_list = prompt_engineering_widget.create_suggestions(suggestions, dataset_name)
-        return code, suggestions_list
-    return "", ""
+        
+        # Generate the main chart
+        main_chart = dcc.Graph(figure=generate_chart(code, dataset_name), style={
+            'width': '100%', 'height': 200, 'resize': 'none',
+            'padding': '10px', 'scrollbar-gutter': 'stable',
+            'color': 'gray', 'fontSize': '16px'
+        })
+        
+        return code, suggestions_list, main_chart
+    return "", "", "The chart will be displayed here..."
 
-# Callback when the one of the suggestions is selected
+# Callback when one of the suggestions is selected
 @callback(
     [Output('prompt-input', 'value'),
      Output('answer-input', 'value', allow_duplicate=True)],
@@ -36,7 +41,10 @@ def save_clicked(n_clicks, prompt, dataset_name):
     prevent_initial_call=True
 )
 def suggestion_clicked(n_clicks, suggestions, suggestion_codes):
-    
+
+    if not any(n_clicks):
+        return no_update, no_update
+
     # Identify which button was clicked
     triggered_index = ctx.triggered_id['index']
     logger.info(f"Updating prompt from suggestion index: {triggered_index}")
