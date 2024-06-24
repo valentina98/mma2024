@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 import io
 import base64
 import ast
+import plotly.express as px
+from widgets.input import create_suggestion_buttons
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -116,16 +118,6 @@ def get_code_and_suggestions(prompt, df, dataset_name):
         logger.exception(f"Error getting suggestions: {e}")
         return "", "", []
 
-# Function to create suggestion buttons
-def create_suggestion_buttons(suggestions):
-    return [
-        html.Div([
-            html.Span(f"({suggestion_score}) ", style={'fontWeight': 'bold'}),
-            html.Button(suggestion, id={'type': 'suggestion-button', 'index': i}, n_clicks=0, style={'margin': '5px', 'width': 'auto'}),
-            html.Div(suggestion_code, id={'type': 'suggestion-code', 'index': i}, style={'display': 'none'})
-        ]) for i, (suggestion, suggestion_score, suggestion_code) in enumerate(suggestions)
-    ]
-
 # Callback to update the dataset table based on selected dataset
 @callback(
     [Output('dataset-table', 'children'),
@@ -211,7 +203,8 @@ def suggestion_clicked(n_clicks, suggestions, suggestion_codes):
     triggered_index = ctx.triggered_id['index']
     logger.info(f"Updating prompt from suggestion index: {triggered_index}")
 
-    return suggestions[triggered_index], suggestion_codes[triggered_index]
+    return suggestions[triggered_index], no_update
+    # return suggestions[triggered_index], suggestion_codes[triggered_index] # ToDo add codes
 
 @callback(
     [Output('combined-history', 'children'),
@@ -301,3 +294,21 @@ def manage_history(submit_n_clicks, delete_n_clicks, clear_n_clicks, restore_n_c
         new_deleted_history = []
 
     return new_combined_history, new_initial_chart_store, new_full_history, new_deleted_history, new_ohlc_chart
+
+@callback(
+    Output({'type': 'suggestion-chart', 'index': ALL}, 'children'),
+    Input({'type': 'suggestion-button', 'index': ALL}, 'n_clicks'),
+    State({'type': 'suggestion-button', 'index': ALL}, 'children'),
+    State({'type': 'suggestion-chart', 'index': ALL}, 'children'),
+    prevent_initial_call=True
+)
+def update_suggestion_charts(n_clicks, suggestions, current_charts):
+
+    triggered_index = ctx.triggered_id['index']
+    new_charts = current_charts[:]
+
+    # Example of generating a small plot (replace with your actual plotting logic)
+    fig = px.line(x=[1, 2, 3], y=[1, 3, 2], title=f'Suggestion {triggered_index}')
+    new_charts[triggered_index] = dcc.Graph(figure=fig, style={'height': '100px'})
+
+    return new_charts
