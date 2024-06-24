@@ -27,7 +27,8 @@ tlm_client = None
 
 if USE_OPEN_AI:
     openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-else:
+
+if not USE_OPEN_AI or CALCULATE_SCORES:
     studio = Studio(api_key=os.environ.get("TLM_API_KEY"))
     tlm_client = studio.TLM()
 
