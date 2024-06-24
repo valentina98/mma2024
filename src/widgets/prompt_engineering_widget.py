@@ -7,8 +7,10 @@ def create_input():
         dbc.Row([
             dbc.Col([
                 dbc.Row([
-                    html.Label('Prompt:', style={'fontWeight': 'bold', 'fontSize': '18px'}),
-                    dcc.Store(id='score-store'),
+                    dbc.Col([
+                        html.Label('Prompt:', style={'fontWeight': 'bold', 'fontSize': '18px', 'display': 'inline-block'}),
+                        html.Span(f"()", id='prompt-score', style={'fontWeight': 'bold', 'margin': '10px', 'display': 'inline-block'})
+                    ], width=12),
                     dbc.Col(dcc.Loading(
                         id="loading-prompt",
                         type="circle",
@@ -57,8 +59,10 @@ def create_input():
         ]),
     ], fluid=True)
 
-def get_suggestion_score(suggestion_score):
-    return html.Span(f"({suggestion_score})", style={'fontWeight': 'bold', 'margin': '10px'})
+def get_score(score):
+    # round to 3 decimal places
+    score = round(score, 3)
+    return html.Span(f"({score})", style={'fontWeight': 'bold', 'margin': '10px'})
 
 def get_suggestion(suggestion_prompt, index):
     return html.Button(suggestion_prompt, id={'type': 'suggestion-button', 'index': index}, n_clicks=0, style={
@@ -77,7 +81,7 @@ def get_suggestion_chart(suggestion_code, dataset_name, index):
 def create_suggestions(suggestions, dataset_name):
     return [
         html.Div([
-            get_suggestion_score(suggestion_score),
+            get_score(suggestion_score),
             dcc.Loading(
                 id={'type': 'loading-suggestion', 'index': i},
                 type="circle",

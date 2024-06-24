@@ -7,7 +7,8 @@ from utils import logger, get_code_and_suggestions, generate_chart
 @callback(
     [Output('answer-input', 'value', allow_duplicate=True),
      Output('suggestions-container', 'children'),
-     Output('resulting-chart', 'children')],
+     Output('resulting-chart', 'children'),
+     Output('prompt-score', 'children')],
     Input('save-button', 'n_clicks'),
     State('prompt-input', 'value'),
     State('selected-dataset-store', 'data'),
@@ -28,8 +29,8 @@ def save_clicked(n_clicks, prompt, dataset_name):
             'color': 'gray', 'fontSize': '16px'
         })
         
-        return code, suggestions_list, main_chart
-    return "", "", "The chart will be displayed here..."
+        return code, suggestions_list, main_chart, prompt_engineering_widget.get_score(trustworthiness_score)
+    return "", "", "The chart will be displayed here...", ""
 
 # Callback when one of the suggestions is selected
 @callback(
