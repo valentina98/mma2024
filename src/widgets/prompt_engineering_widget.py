@@ -34,13 +34,17 @@ def create_input():
                             }, placeholder='Answer will be displayed here...')
                         ), width=8),
                     dbc.Col(
-                        html.Div(
-                        'The chart will be displayed here...',
-                        id='resulting-chart', style={
-                        'width': '100%', 'height': 200, 'resize': 'none',
-                        'padding': '10px', 'scrollbar-gutter': 'stable',
-                        'color': 'gray', 'fontSize': '16px'}
-                    ), width=4),
+                        dbc.Col(dcc.Loading(
+                            id="loading-chart",
+                            type="graph",
+                            fullscreen=False,
+                            children=html.Div(
+                                'The chart will be displayed here...',
+                                id='resulting-chart', style={
+                                'width': '100%', 'height': 200, 'resize': 'none',
+                                'padding': '10px', 'scrollbar-gutter': 'stable',
+                                'color': 'gray', 'fontSize': '16px'})
+                    )), width=4),
                 ]),
                 dbc.Row([
                     dbc.Col(dbc.Button('Save', id='save-button', color='primary', className='me-2', style={'width': '100%', 'min-width': '150px', 'padding': '5px'}), width='auto'),
