@@ -73,7 +73,7 @@ def manage_history(submit_n_clicks, delete_n_clicks, clear_n_clicks, restore_n_c
         else:
             return no_update, no_update, no_update, no_update, [html.Div(f"Dataset {selected_dataset_store} not found.")] + history_children
 
-    # Handle delete button
+    # Handle delete button 
     if 'delete-button' in triggered_id:
         index = int(triggered_id.split(':')[1].split(',')[0])
         deleted_entry = new_combined_history.pop(len(new_combined_history) - 1 - index)

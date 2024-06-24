@@ -155,7 +155,7 @@ def generate_chart(code_str, dataset_name):
             dict(
                 source='data:image/png;base64,' + img_base64,
                 xref="paper", yref="paper",
-                x=0, y=1,
+                x=0, y=1, 
                 sizex=1, sizey=1,
                 xanchor="left",
                 yanchor="top",
