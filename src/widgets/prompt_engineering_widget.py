@@ -64,8 +64,9 @@ def create_input():
     ], fluid=True)
 
 def create_score_span(score):
-    # round to 3 decimal places
-    score = round(score, 3)
+    if score and isinstance(score, float):
+        # round to 3 decimal places
+        score = round(score, 3)
     return html.Span(f"({score})", style={'fontWeight': 'bold', 'margin': '10px'})
 
 def create_suggestion(suggestion_prompt, index):
