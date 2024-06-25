@@ -1,9 +1,55 @@
-.border-widget{
+/* General styles */
+html, body {
+    overflow: clip;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.border-widget {
     border-radius: 0.375rem;
     border: 1px solid #babfc7;
 }
 
+.dash-textarea {
+    width: 100%;
+    height: 150px;
+    resize: none;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 1px solid gray;
+    scrollbar-gutter: stable;
+}
 
+.dash-button {
+    width: 100%;
+    min-width: 150px;
+    padding: 5px;
+}
+
+.dash-loading {
+    opacity: 0.5;
+}
+
+.dash-spinner::before {
+    content: "";
+    display: block;
+    width: 24px;
+    height: 24px;
+    margin: 1px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: spinner 1.5s linear infinite;
+}
+
+@keyframes spinner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Header styles */
 #header {
     font-family: sans-serif;
     font-weight: bold;
@@ -16,69 +62,34 @@
     padding-right: 100px;
 }
 
-.tab-content{
+/* Tab styles */
+.tab-content {
     height: 100%;
     display: contents;
 }
 
-.tab-parent{
+.tab-parent {
     height: 100%;
 }
 
-.radio-buttons{
+.radio-buttons {
     font-family: sans-serif;
     font-weight: bold;
     font-size: 20px;
     display: inline;
 }
 
-#left-tab-radio-buttons{
+#left-tab-radio-buttons {
     margin-left: 16px;
 }
 
+/* Main container */
 #container {
     height: 100vh;
     padding: 65px 100px;
 }
 
-#wordcloud {
-    cursor:pointer;
-    height: 100%;
-    width: 100%;
-}
-
-.wordcloud-container{
-    overflow: clip;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.wordcloud-container > div{
-    overflow: clip;
-    height: 100%;
-    max-height: 100%;
-    width: 100%;
-    max-width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#histogram {
-    width: 100%;
-    height: 100%;
-}
-
-#heatmap {
-    position: relative; 
-}
-
-#heatmap-container {
-    overflow: scroll; 
-    position: relative;
-}
-
+/* Main column layout */
 .main-col {
     height: 100%;
     padding: 0;
@@ -97,7 +108,8 @@
     height: 100%;
 }
 
-.gallery{
+/* Gallery styles */
+.gallery {
     overflow-y: scroll;
     overflow-x: clip;
 }
@@ -107,36 +119,30 @@
     margin-left: 10px;
 }
 
-.gallery-image{
+.gallery-image {
     border: 2px solid #636363;
     width: 100px;
     height: 100px;
 }
 
 .gallery-card {
-    cursor:pointer;
+    cursor: pointer;
 }
 
 .gallery-col {
     text-align: center;
 }
 
-.gallery-row{
+.gallery-row {
     padding-bottom: 20px;
     padding-top: 20px;
 }
 
 .gallery-text {
-  color: #656565;
+    color: #656565;
 }
 
-html, body {
-    overflow: clip;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-}
-
+/* Wordcloud styles */
 .wc-canvas-hover-label {
     position: absolute;
     background-color: rgba(255, 255, 255, 0);
@@ -145,16 +151,132 @@ html, body {
     display: none;
 }
 
-.wc-canvas-hover{
+.wc-canvas-hover {
     border: 1px solid rgba(100, 100, 100, 1);
     box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
     display: none;
 }
 
-/* removes all plot legend toggles*/
+/* Plotly legend toggle */
 .legendtoggle {
-   display: none;
+    display: none;
 }
+
 .legendtext {
-   cursor: default;
+    cursor: default;
+}
+
+/* Specific component styles */
+.label {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+#prompt-score {
+    font-weight: bold;
+    margin: 10px;
+    display: inline-block;
+}
+
+#prompt-input {
+    height: 150px;
+}
+
+#answer-input {
+    height: 200px;
+}
+
+.resulting-chart {
+    width: 100%;
+    height: 200px;
+    resize: none;
+    padding: 10px;
+    scrollbar-gutter: stable;
+    color: gray;
+    font-size: 16px;
+}
+
+#suggestions-container {
+    height: 450px;
+    padding: 10px;
+    border-radius: 10px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+}
+
+.suggestion-score {
+    font-weight: bold;
+    margin: 10px;
+}
+
+.suggestion-button {
+    margin: 5px;
+    border-radius: 10px;
+    border: none;
+    padding: 10px;
+    background-color: #F9F9F9;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.suggestion-chart {
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    margin-left: 10px;
+}
+
+.suggestion-chart-div {
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    margin-left: 10px;
+}
+
+.suggestion-container {
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    background-color: #F9F9F9;
+}
+
+#main-chart {
+    width: 100%;
+    height: 200px;
+    resize: none;
+    padding: 10px;
+    scrollbar-gutter: stable;
+    color: gray;
+    font-size: 16px;
+}
+
+/* Hide the default browser spinner */
+.dash-spinner {
+    display: none;
+}
+
+/* History widget styles */
+.history-container {
+    height: 500px;
+    overflow: auto;
+}
+
+.history-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.history-entry-content {
+    flex: 1;
+    padding: 10px;
+}
+
+.history-button {
+    margin-top: 20px;
 }

@@ -8,56 +8,46 @@ def create_input():
             dbc.Col([
                 dbc.Row([
                     dbc.Col([
-                        html.Label('Prompt:', style={'fontWeight': 'bold', 'fontSize': '18px', 'display': 'inline-block'}),
-                        html.Span("", id='prompt-score', style={'fontWeight': 'bold', 'margin': '10px', 'display': 'inline-block'})
+                        html.Label('Prompt:', className='label'),
+                        html.Span("", id='prompt-score', className='prompt-score')
                     ], width=12),
                     dbc.Col(dcc.Loading(
                         id="loading-prompt",
+                        className='dash-loading',
                         type="circle",
-                        children=dcc.Textarea(id='prompt-input', style={
-                            'width': '100%', 'height': 150, 'resize': 'none',
-                            'padding': '10px', 'fontSize': '16px', 'borderRadius': '10px',
-                            'border': '1px solid gray', 'scrollbar-gutter': 'stable'
-                        }, placeholder='Enter your prompt here...')
+                        children=dcc.Textarea(id='prompt-input', className='dash-textarea', placeholder='Enter your prompt here...')
                     ), width=12)
                 ]),
                 dbc.Row([
-                    html.Label('Code and Chart:', style={'fontWeight': 'bold', 'fontSize': '18px'}),
+                    html.Label('Code and Chart:', className='label'),
                     dbc.Col(
                         dcc.Loading(
                             id="loading-answer",
+                            className='dash-loading',
                             type="circle",
-                            children=dcc.Textarea(id='answer-input', style={
-                                'width': '100%', 'height': 200, 'resize': 'none',
-                                'padding': '10px', 'fontSize': '16px', 'borderRadius': '10px',
-                                'border': '1px solid gray', 'scrollbar-gutter': 'stable'
-                            }, placeholder='Answer will be displayed here...')
+                            children=dcc.Textarea(id='answer-input', className='dash-textarea', style={'height': '200px'}, placeholder='Answer will be displayed here...')
                         ), width=8),
                     dbc.Col(
-                        dbc.Col(dcc.Loading(
+                        dcc.Loading(
                             id="loading-chart",
+                            className='dash-loading',
                             type="graph",
                             fullscreen=False,
                             children=html.Div(
                                 'The chart will be displayed here...',
-                                id='resulting-chart', style={
-                                'width': '100%', 'height': 200, 'resize': 'none',
-                                'padding': '10px', 'scrollbar-gutter': 'stable',
-                                'color': 'gray', 'fontSize': '16px'})
-                    )), width=4),
+                                id='resulting-chart', className='resulting-chart'
+                            )
+                        ), width=4),
                 ]),
                 dbc.Row([
-                    dbc.Col(dbc.Button('Save', id='save-button', color='primary', className='me-2', style={'width': '100%', 'min-width': '150px', 'padding': '5px'}), width='auto'),
-                    dbc.Col(dbc.Button('Submit', id='submit-button', color='success', style={'width': '100%', 'min-width': '150px', 'padding': '5px'}), width='auto')
+                    dbc.Col(dbc.Button('Save', id='save-button', color='primary', className='dash-button me-2'), width='auto'),
+                    dbc.Col(dbc.Button('Submit', id='submit-button', color='success', className='dash-button'), width='auto')
                 ], justify='center', style={'margin': '20px'}),
             ], width=8),
             dbc.Col([
                 html.Div([
-                    html.Label('Suggestions:', style={'fontWeight': 'bold', 'fontSize': '18px'}),
-                    html.Div(id='suggestions-container', style={
-                        'height': 450, 'padding': '10px', 'borderRadius': '10px',
-                        'overflowY': 'scroll', 'overflowX': 'hidden', 'scrollbar-gutter': 'stable'
-                    }),
+                    html.Label('Suggestions:', className='label'),
+                    html.Div(id='suggestions-container', className='suggestions-container'),
                 ])
             ], width=4)
         ]),
@@ -65,28 +55,18 @@ def create_input():
 
 def create_score_span(score):
     if score and isinstance(score, float):
-        # round to 3 decimal places
         score = round(score, 3)
-    return html.Span(f"({score})", style={'fontWeight': 'bold', 'margin': '10px'})
+    return html.Span(f"({score})", className='suggestion-score')
 
 def create_suggestion(suggestion_prompt, index):
-    return html.Button(suggestion_prompt, id={'type': 'suggestion-button', 'index': index}, n_clicks=0, style={
-        'margin': '5px', 'borderRadius': '10px', 'border': 'none', 'padding': '10px',
-        'backgroundColor': '#F9F9F9', 'width': '100%', 'display': 'flex', 'alignItems': 'center'
-    })
+    return html.Button(suggestion_prompt, id={'type': 'suggestion-button', 'index': index}, n_clicks=0, className='suggestion-button')
 
 def create_main_chart(code, dataset_name):
-    return dcc.Graph(id="main-chart", figure=generate_chart(code, dataset_name), style={
-        'width': '100%', 'height': 200, 'resize': 'none',
-        'padding': '10px', 'scrollbar-gutter': 'stable',
-        'color': 'gray', 'fontSize': '16px'})
+    return dcc.Graph(id="main-chart", figure=generate_chart(code, dataset_name), className='main-chart')
 
 def create_suggestion_chart(suggestion_code, dataset_name, index):
-    chart_graph = dcc.Graph(figure=generate_chart(suggestion_code, dataset_name), 
-        style={'display': 'inline-block', 'width': '100px', 'height': '100px', 'marginLeft': '10px'})
-    chart_div = html.Div(id={'type': 'suggestion-chart', 'index': index}, children=chart_graph, style={
-        'display': 'inline-block', 'width': '100px', 'height': '100px', 'marginLeft': '10px'
-    })
+    chart_graph = dcc.Graph(figure=generate_chart(suggestion_code, dataset_name), className='suggestion-chart')
+    chart_div = html.Div(id={'type': 'suggestion-chart', 'index': index}, children=chart_graph, className='suggestion-chart-div')
     return chart_div
 
 def create_suggestions(suggestions, dataset_name):
@@ -95,13 +75,11 @@ def create_suggestions(suggestions, dataset_name):
             create_score_span(suggestion_score),
             dcc.Loading(
                 id={'type': 'loading-suggestion', 'index': i},
+                className='dash-loading',
                 type="circle",
                 children=create_suggestion(suggestion_prompt, i),
             ),
             create_suggestion_chart(suggestion_code, dataset_name, i),
             html.Div(hidden=True, children=suggestion_code, id={'type': 'suggestion-code', 'index': i})
-        ], style={
-            'display': 'flex', 'alignItems': 'center', 'borderRadius': '10px', 
-            'padding': '10px', 'marginBottom': '10px', 'cursor': 'pointer', 'backgroundColor': '#F9F9F9'
-        }) for i, (suggestion_prompt, suggestion_score, suggestion_code) in enumerate(suggestions)
+        ], className='suggestion-container') for i, (suggestion_prompt, suggestion_score, suggestion_code) in enumerate(suggestions)
     ]

@@ -21,23 +21,22 @@ plt.show()
 
 def create_history_widget():
     # Create initial chart
-    # ToDo: Remove initial chart
-    initial_chart = dcc.Graph(figure=generate_chart(code, 'Housing'), style={'width': '100%', 'height': '100%', 'overflow': 'auto'}) 
+    initial_chart = dcc.Graph(figure=generate_chart(code, 'Housing'), className='history-chart')
     initial_prompt = html.P("Initial Prompt", style={'text-align': 'center'})
     initial_entry = html.Div([
-        html.Div([initial_prompt], style={'flex': '1', 'padding': '10px'}),
-        html.Div([initial_chart], style={'flex': '1', 'padding': '10px'}),
-        html.Button('Delete', id={'type': 'delete-button', 'index': 0}, n_clicks=0)
-    ], style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center'})
+        html.Div([initial_prompt], className='history-entry-content'),
+        html.Div([initial_chart], className='history-entry-content', style={'width': '100px', 'height': '100px'}),
+        html.Button('Delete', id={'type': 'delete-button', 'index': 0}, n_clicks=0, className='history-delete-button')
+    ], className='history-entry')
 
     return dbc.Container(id='history-container', children=[
         dbc.Row([
             dbc.Col(html.Div(id='combined-history', children=[
                 initial_entry
-            ], style={'height': '500px', 'overflow': 'auto'}), width=12)
+            ], className='history-container'), width=12)
         ]),
         dbc.Row([
-            dbc.Col(dbc.Button('Clear History', id='clear-history-button', color='danger'), width='auto'),
-            dbc.Col(dbc.Button('Restore History', id='restore-history-button', color='secondary'), width='auto')
-        ], justify='center', style={'marginTop': '20px'})
+            dbc.Col(dbc.Button('Clear History', id='clear-history-button', color='danger', className='history-button'), width='auto'),
+            dbc.Col(dbc.Button('Restore History', id='restore-history-button', color='secondary', className='history-button'), width='auto')
+        ], justify='center')
     ], fluid=True)
