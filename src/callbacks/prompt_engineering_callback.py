@@ -1,15 +1,16 @@
 from dash import callback, Output, Input, State, ctx, no_update
 from dash.dependencies import ALL
-from src.widgets import prompt_engineering_widget
+from src.widgets import prompt_engineering_widget, popup_error_widget
 from utils import logger, get_code_and_suggestions, generate_chart
 
 
-# Callback when the "Submit Prompt" button is clicked
+# Callback when the "Submit The Prompt" button is clicked
 @callback(
     [Output('answer-input', 'value', allow_duplicate=True),
      Output('suggestions-container', 'children'),
      Output('main-chart-container', 'children'),
-     Output('prompt-score', 'children')],
+     Output('prompt-score', 'children'),
+     Output('error-popup-container', 'children')],
     Input('submit-button', 'n_clicks'),
     State('prompt-input', 'value'),
     State('selected-dataset-store', 'data'),
@@ -17,7 +18,7 @@ from utils import logger, get_code_and_suggestions, generate_chart
 )
 def save_clicked(n_clicks, prompt, dataset_name):
     logger.info(f"Handling save and suggestions for prompt: {prompt}, n_clicks: {n_clicks}, selected_dataset_store: {dataset_name}")
-    if n_clicks > 0 and prompt and dataset_name:
+    if dataset_name:
         code, trustworthiness_score, suggestions = get_code_and_suggestions(prompt, dataset_name)
 
         # Generate suggestions and charts
@@ -26,8 +27,9 @@ def save_clicked(n_clicks, prompt, dataset_name):
         # Generate the main chart
         main_chart = prompt_engineering_widget.create_main_chart(code, dataset_name)
         
-        return code, suggestions_list, main_chart, prompt_engineering_widget.create_score_span(trustworthiness_score)
-    return "", "", "The chart will be displayed here...", ""
+        return code, suggestions_list, main_chart, prompt_engineering_widget.create_score_span(trustworthiness_score), no_update
+    else:
+        return "", "", "The chart will be displayed here...", "", popup_error_widget.create_popup_error("Please select a dataset before submitting the prompt.")
 
 
 # Callback when one of the suggestions is selected
