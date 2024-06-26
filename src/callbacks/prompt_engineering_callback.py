@@ -8,7 +8,7 @@ from utils import logger, get_code_and_suggestions, generate_chart
 @callback(
     [Output('answer-input', 'value', allow_duplicate=True),
      Output('suggestions-container', 'children'),
-     Output('resulting-chart', 'children'),
+     Output('main-chart-container', 'children'),
      Output('prompt-score', 'children')],
     Input('save-button', 'n_clicks'),
     State('prompt-input', 'value'),
@@ -24,8 +24,7 @@ def save_clicked(n_clicks, prompt, dataset_name):
         suggestions_list = prompt_engineering_widget.create_suggestions(suggestions, dataset_name)
         
         # Generate the main chart
-        fig = generate_chart(code, dataset_name)
-        main_chart = prompt_engineering_widget.create_main_chart(fig)
+        main_chart = prompt_engineering_widget.create_main_chart(code, dataset_name)
         
         return code, suggestions_list, main_chart, prompt_engineering_widget.create_score_span(trustworthiness_score)
     return "", "", "The chart will be displayed here...", ""

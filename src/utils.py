@@ -133,12 +133,13 @@ def generate_chart(code_str, dataset_name):
     try:
         df = load_dataset(dataset_name)
 
-        # Create an image from the code
+        # Create an image from the code and save it in the buffer
         plt.close('all')
-        code_str = textwrap.dedent(code_str) # Dedent the code string to remove leading spaces (maybe not needed?)
+        code_str = textwrap.dedent(code_str)  # Dedent the code string to remove leading spaces
         exec(code_str, {'df': df, 'plt': plt, 'pd': pd})
+        
         buf = io.BytesIO()
-        plt.savefig(buf, format='png', bbox_inches='tight')
+        plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0)
         buf.seek(0)
         img_base64 = base64.b64encode(buf.read()).decode('utf-8')
         buf.close()
@@ -148,21 +149,19 @@ def generate_chart(code_str, dataset_name):
         fig.add_layout_image(
             dict(
                 source='data:image/png;base64,' + img_base64,
+                x=0.5, y=0.5,
+                xanchor="center",
+                yanchor="middle",
                 xref="paper", yref="paper",
-                x=0, y=1,
                 sizex=1, sizey=1,
-                xanchor="left",
-                yanchor="top",
                 sizing="contain",
                 layer="below"
             )
         )
-
-        # Update figure layout
-        fig.update_xaxes(visible=False, range=[0, 1])
-        fig.update_yaxes(visible=False, range=[0, 1])
         fig.update_layout(
-            margin=dict(l=0, r=0, t=0, b=0),
+            xaxis=dict(visible=False, range=[0, 1]),
+            yaxis=dict(visible=False, range=[0, 1]),
+            margin=dict(l=5, r=5, t=5, b=5),
             paper_bgcolor="white",
             plot_bgcolor="white"
         )
@@ -186,14 +185,15 @@ def generate_chart(code_str, dataset_name):
             align="center"
         )
         fig.update_layout(
+            xaxis=dict(visible=False, range=[0, 1]),
+            yaxis=dict(visible=False, range=[0, 1]),
             margin=dict(l=0, r=0, t=0, b=0),
             paper_bgcolor="white",
             plot_bgcolor="white"
         )
-        fig.update_xaxes(visible=False, range=[0, 1])
-        fig.update_yaxes(visible=False, range=[0, 1])
-        return fig
         
+        return fig
+    
 
 # def encode_image(image):
 #     image_base64 = base64.b64encode(image).decode('utf-8')
