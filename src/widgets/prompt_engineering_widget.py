@@ -61,13 +61,12 @@ def create_score_span(score):
 def create_suggestion(suggestion_prompt, index):
     return html.Button(suggestion_prompt, id={'type': 'suggestion-button', 'index': index}, n_clicks=0, className='suggestion-button')
 
-def create_main_chart(code, dataset_name):
-    return dcc.Graph(id="main-chart", figure=generate_chart(code, dataset_name), className='main-chart')
+def create_main_chart(fig):
+    return dcc.Graph(id="main-chart", figure=fig, className='main-chart')
 
-def create_suggestion_chart(suggestion_code, dataset_name, index):
-    chart_graph = dcc.Graph(figure=generate_chart(suggestion_code, dataset_name), className='suggestion-chart')
-    chart_div = html.Div(id={'type': 'suggestion-chart', 'index': index}, children=chart_graph, className='suggestion-chart-div')
-    return chart_div
+def create_suggestion_chart(fig, index):
+    chart_graph = dcc.Graph(figure=fig, className='suggestion-chart')
+    return html.Div(id={'type': 'suggestion-chart', 'index': index}, children=chart_graph, className='suggestion-chart-div')
 
 def create_suggestions(suggestions, dataset_name):
     return [
@@ -79,7 +78,7 @@ def create_suggestions(suggestions, dataset_name):
                 type="circle",
                 children=create_suggestion(suggestion_prompt, i),
             ),
-            create_suggestion_chart(suggestion_code, dataset_name, i),
+            create_suggestion_chart(generate_chart(suggestion_code, dataset_name), i),
             html.Div(hidden=True, children=suggestion_code, id={'type': 'suggestion-code', 'index': i})
         ], className='suggestion-container') for i, (suggestion_prompt, suggestion_score, suggestion_code) in enumerate(suggestions)
     ]

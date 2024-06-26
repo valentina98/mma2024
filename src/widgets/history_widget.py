@@ -19,14 +19,35 @@ plt.title("January Expenses")
 plt.show()
 '''
 
+def create_delete_button(button_id):
+    return dbc.Button('Delete', id=button_id, n_clicks=0, className='history-button', color='danger')
+
+def create_new_prompt(prompt_value):
+    return html.Div([html.P(prompt_value, className='history-prompt')], className='history-entry-content')
+
+def create_new_chart(fig):
+    return html.Div([dcc.Graph(figure=fig, className='history-chart')], className='history-entry-content')
+
+def create_new_entry(prompt_value, fig, full_history_length):
+    new_prompt_div = create_new_prompt(prompt_value)
+    new_chart_div = create_new_chart(fig)
+    delete_button = create_delete_button({'type': 'delete-button', 'index': full_history_length})
+    return html.Div([new_prompt_div, new_chart_div, delete_button], className='history-entry')
+
+def create_error(error_message):
+    return html.Div(f"An error occurred while plotting the chart: {error_message}", className='history-error')
+
 def create_history_widget():
     # Create initial chart
-    initial_chart = dcc.Graph(figure=generate_chart(code, 'Housing'), className='history-chart')
-    initial_prompt = html.P("Initial Prompt", style={'text-align': 'center'})
+    # ToDo: Remove initial plot
+    fig = generate_chart(code, 'Housing')
+    initial_chart = create_new_chart(fig)
+    initial_prompt = create_new_prompt("Initial Prompt")
+    delete_button = create_delete_button({'type': 'delete-button', 'index': 0})
     initial_entry = html.Div([
-        html.Div([initial_prompt], className='history-entry-content'),
-        html.Div([initial_chart], className='history-entry-content', style={'width': '100px', 'height': '100px'}),
-        html.Button('Delete', id={'type': 'delete-button', 'index': 0}, n_clicks=0, className='history-delete-button')
+        initial_prompt,
+        initial_chart,
+        delete_button
     ], className='history-entry')
 
     return dbc.Container(id='history-container', children=[
@@ -36,7 +57,7 @@ def create_history_widget():
             ], className='history-container'), width=12)
         ]),
         dbc.Row([
-            dbc.Col(dbc.Button('Clear History', id='clear-history-button', color='danger', className='history-button'), width='auto'),
-            dbc.Col(dbc.Button('Restore History', id='restore-history-button', color='secondary', className='history-button'), width='auto')
+            dbc.Col(dbc.Button('Clear History', id='clear-history-button', className='history-button', color='danger'), width='auto'),
+            dbc.Col(dbc.Button('Restore History', id='restore-history-button', className='history-button', color='secondary'), width='auto')
         ], justify='center')
     ], fluid=True)

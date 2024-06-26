@@ -1,7 +1,7 @@
 from dash import callback, Output, Input, State, ctx, no_update
 from dash.dependencies import ALL
 from src.widgets import prompt_engineering_widget
-from utils import logger, get_code_and_suggestions
+from utils import logger, get_code_and_suggestions, generate_chart
 
 
 # Callback when the "Save" button is clicked
@@ -24,7 +24,8 @@ def save_clicked(n_clicks, prompt, dataset_name):
         suggestions_list = prompt_engineering_widget.create_suggestions(suggestions, dataset_name)
         
         # Generate the main chart
-        main_chart = prompt_engineering_widget.create_main_chart(code, dataset_name)
+        fig = generate_chart(code, dataset_name)
+        main_chart = prompt_engineering_widget.create_main_chart(fig)
         
         return code, suggestions_list, main_chart, prompt_engineering_widget.create_score_span(trustworthiness_score)
     return "", "", "The chart will be displayed here...", ""

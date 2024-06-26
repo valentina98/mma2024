@@ -32,23 +32,6 @@ html, body {
     opacity: 0.5;
 }
 
-.dash-spinner::before {
-    content: "";
-    display: block;
-    width: 24px;
-    height: 24px;
-    margin: 1px;
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid #3498db;
-    border-radius: 50%;
-    animation: spinner 1.5s linear infinite;
-}
-
-@keyframes spinner {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
 /* Header styles */
 #header {
     font-family: sans-serif;
@@ -106,55 +89,6 @@ html, body {
 .stretchy-widget {
     width: 100%;
     height: 100%;
-}
-
-/* Gallery styles */
-.gallery {
-    overflow-y: scroll;
-    overflow-x: clip;
-}
-
-.header-button {
-    background-color: white;
-    margin-left: 10px;
-}
-
-.gallery-image {
-    border: 2px solid #636363;
-    width: 100px;
-    height: 100px;
-}
-
-.gallery-card {
-    cursor: pointer;
-}
-
-.gallery-col {
-    text-align: center;
-}
-
-.gallery-row {
-    padding-bottom: 20px;
-    padding-top: 20px;
-}
-
-.gallery-text {
-    color: #656565;
-}
-
-/* Wordcloud styles */
-.wc-canvas-hover-label {
-    position: absolute;
-    background-color: rgba(255, 255, 255, 0);
-    color: rgba(0, 0, 0, 0);
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
-    display: none;
-}
-
-.wc-canvas-hover {
-    border: 1px solid rgba(100, 100, 100, 1);
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
-    display: none;
 }
 
 /* Plotly legend toggle */
@@ -255,21 +189,20 @@ html, body {
     font-size: 16px;
 }
 
-/* Hide the default browser spinner */
-.dash-spinner {
-    display: none;
-}
-
 /* History widget styles */
 .history-container {
     height: 500px;
     overflow: auto;
+    padding: 10px;
+    border-radius: 10px;
+    scrollbar-gutter: stable;
 }
 
 .history-entry {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 10px;
 }
 
 .history-entry-content {
@@ -277,6 +210,44 @@ html, body {
     padding: 10px;
 }
 
+.history-chart {
+    width: 300px;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.history-prompt {
+   /* text-align: 'center'; */
+   justify-content: center;
+   align-items: center;
+}
+
 .history-button {
     margin-top: 20px;
+    border-radius: 10px;
 }
+
+.history-error {
+    color: red;
+}
+
+/* Scrollbar styles for WebKit browsers (Chrome, Safari) */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: lightgrey;
+}
+
+::-webkit-scrollbar-button {
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-position: center;
+}
+
+/* ToDo: fix scrollbar on history page */

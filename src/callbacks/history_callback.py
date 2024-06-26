@@ -5,7 +5,9 @@ import os
 import matplotlib.pyplot as plt
 import io
 import base64
-from utils import get_dataset_path
+from utils import get_dataset_path, logger
+from src.widgets.history_widget import create_new_entry, create_error
+from utils import generate_chart
 
 @callback(
     [Output('combined-history', 'children'),
@@ -32,6 +34,7 @@ def manage_history(submit_n_clicks, delete_n_clicks, clear_n_clicks, restore_n_c
     if not ctx.triggered:
         return no_update, no_update, no_update, no_update, no_update
 
+    # triggered_index = ctx.triggered_id['index'] # Can we use this instead of the below?
     triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
     new_combined_history = history_children
@@ -42,37 +45,22 @@ def manage_history(submit_n_clicks, delete_n_clicks, clear_n_clicks, restore_n_c
 
     # Handle submit button
     if triggered_id == 'submit-button' and submit_n_clicks > 0 and answer_input_value and selected_dataset_store:
-        data_path = get_dataset_path(selected_dataset_store)
-        if os.path.exists(data_path):
-            data = pd.read_csv(data_path)
-            try:
-                modified_code = answer_input_value.replace("housing", "df") # ToDo: do we need that
-                exec(modified_code, {'df': data, 'plt': plt, 'pd': pd})
+        try:
+            # modified_code = answer_input_value.replace("housing", "df") # ToDo: do we need that
+            fig = generate_chart(answer_input_value, selected_dataset_store)
 
-                buf = io.BytesIO()
-                plt.savefig(buf, format='png')
-                buf.seek(0)
-                image_base64 = base64.b64encode(buf.read()).decode('utf-8')
-                plt.close()
+            new_entry = create_new_entry(prompt_value, fig, len(full_history))
 
-                new_prompt_div = html.Div([html.P(prompt_value, style={'text-align': 'center'})], style={'flex': '1', 'padding': '10px'})
-                new_chart_div = html.Div([html.Img(src=f'data:image/png;base64,{image_base64}')], style={'flex': '1', 'padding': '10px'})
-                delete_button = html.Button('Delete', id={'type': 'delete-button', 'index': len(full_history)}, n_clicks=0)
-
-                new_entry = html.Div([new_prompt_div, new_chart_div, delete_button], style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center'})
-
-                if initial_chart_present:
-                    new_combined_history = [new_entry]
-                    new_full_history = [new_entry]
-                    new_initial_chart_store = False  # Set the flag to False after removing the initial entry
-                else:
-                    new_combined_history = [new_entry] + history_children
-                    new_full_history = [new_entry] + full_history
-            except Exception as e:
-                return no_update, no_update, no_update, no_update, [html.Div(f"An error occurred while plotting the chart: {str(e)}")] + history_children
-        else:
-            return no_update, no_update, no_update, no_update, [html.Div(f"Dataset {selected_dataset_store} not found.")] + history_children
-
+            if initial_chart_present:
+                new_combined_history = [new_entry]
+                new_full_history = [new_entry]
+                new_initial_chart_store = False  # Set the flag to False after removing the initial entry
+            else:
+                new_combined_history = [new_entry] + history_children
+                new_full_history = [new_entry] + full_history
+        except Exception as e:
+            return no_update, no_update, no_update, no_update, [create_error(str(e))] + history_children
+        
     # Handle delete button
     if 'delete-button' in triggered_id:
         index = int(triggered_id.split(':')[1].split(',')[0])

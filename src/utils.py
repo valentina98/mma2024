@@ -133,18 +133,17 @@ def generate_chart(code_str, dataset_name):
     try:
         df = load_dataset(dataset_name)
 
+        # Create an image from the code
         plt.close('all')
-
         code_str = textwrap.dedent(code_str) # Dedent the code string to remove leading spaces (maybe not needed?)
         exec(code_str, {'df': df, 'plt': plt, 'pd': pd})
-
         buf = io.BytesIO()
         plt.savefig(buf, format='png', bbox_inches='tight')
         buf.seek(0)
-
-        img_base64 = base64.b64encode(buf.read()).decode('ascii')
+        img_base64 = base64.b64encode(buf.read()).decode('utf-8')
         buf.close()
 
+        # Create a Plotly figure with the image
         fig = go.Figure()
         fig.add_layout_image(
             dict(
@@ -159,6 +158,7 @@ def generate_chart(code_str, dataset_name):
             )
         )
 
+        # Update figure layout
         fig.update_xaxes(visible=False, range=[0, 1])
         fig.update_yaxes(visible=False, range=[0, 1])
         fig.update_layout(
@@ -185,13 +185,13 @@ def generate_chart(code_str, dataset_name):
             font=dict(color="red", size=8),
             align="center"
         )
-        fig.update_xaxes(visible=False, range=[0, 1])
-        fig.update_yaxes(visible=False, range=[0, 1])
         fig.update_layout(
             margin=dict(l=0, r=0, t=0, b=0),
             paper_bgcolor="white",
             plot_bgcolor="white"
         )
+        fig.update_xaxes(visible=False, range=[0, 1])
+        fig.update_yaxes(visible=False, range=[0, 1])
         return fig
         
 
