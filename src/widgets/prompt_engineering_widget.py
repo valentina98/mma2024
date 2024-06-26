@@ -15,7 +15,7 @@ def create_input():
                         id="loading-prompt",
                         className='dash-loading',
                         type="circle",
-                        children=dcc.Textarea(id='prompt-input', className='dash-textarea', placeholder='Enter your prompt here...')
+                        children=dcc.Textarea(id='prompt-input', className='dash-textarea', placeholder='Provide a prompt to generate a plot from your dataset...')
                     )
                 ]),
                 dbc.Row([
