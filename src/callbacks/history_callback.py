@@ -15,7 +15,7 @@ from utils import generate_chart
      Output('full-history-store', 'data'),
      Output('deleted-history-store', 'data'),
      Output('ohls-chart', 'children')],
-    [Input('submit-button', 'n_clicks'),
+    [Input('save-button', 'n_clicks'),
      Input({'type': 'delete-button', 'index': ALL}, 'n_clicks'),
      Input('clear-history-button', 'n_clicks'),
      Input('restore-history-button', 'n_clicks')],
@@ -28,7 +28,7 @@ from utils import generate_chart
      State('deleted-history-store', 'data')],
     prevent_initial_call=True
 )
-def manage_history(submit_n_clicks, delete_n_clicks, clear_n_clicks, restore_n_clicks,
+def manage_history(save_n_clicks, delete_n_clicks, clear_n_clicks, restore_n_clicks,
                    prompt_value, selected_dataset_store, answer_input_value, history_children, initial_chart_present, full_history, deleted_history):
     
     if not ctx.triggered:
@@ -44,7 +44,7 @@ def manage_history(submit_n_clicks, delete_n_clicks, clear_n_clicks, restore_n_c
     new_ohlc_chart = no_update
 
     # Handle submit button
-    if triggered_id == 'submit-button' and submit_n_clicks > 0 and answer_input_value and selected_dataset_store:
+    if triggered_id == 'save-button' and save_n_clicks > 0 and answer_input_value and selected_dataset_store:
         try:
             # modified_code = answer_input_value.replace("housing", "df") # ToDo: do we need that
             fig = generate_chart(answer_input_value, selected_dataset_store)

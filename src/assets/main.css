@@ -86,24 +86,22 @@ html, body {
 }
 
 /* Plotly legend toggle */
-.legendtoggle {
+/* .legendtoggle {
     display: none;
 }
 
 .legendtext {
     cursor: default;
-}
+} */
 
-/* Prompt engineering page */
+/* Prompt engineering widget styles */
 .pe-button {
     width: 100%;
-    min-width: 100px;
+    min-width: 150px;
     padding: 5px;
-    margin: 5px;
+    margin: 15px 0 15px 0;
 }
 
-
-/* Specific component styles */
 .label {
     font-weight: bold;
     font-size: 18px;
@@ -120,7 +118,7 @@ html, body {
 }
 
 #answer-input {
-    height: 200px;
+    height: 150px;
 }
 
 #main-chart {

@@ -4,13 +4,13 @@ from src.widgets import prompt_engineering_widget
 from utils import logger, get_code_and_suggestions, generate_chart
 
 
-# Callback when the "Save" button is clicked
+# Callback when the "Submit Prompt" button is clicked
 @callback(
     [Output('answer-input', 'value', allow_duplicate=True),
      Output('suggestions-container', 'children'),
      Output('main-chart-container', 'children'),
      Output('prompt-score', 'children')],
-    Input('save-button', 'n_clicks'),
+    Input('submit-button', 'n_clicks'),
     State('prompt-input', 'value'),
     State('selected-dataset-store', 'data'),
     prevent_initial_call=True
@@ -51,4 +51,4 @@ def suggestion_clicked(n_clicks, suggestions, suggestion_codes):
     return suggestions[triggered_index], suggestion_codes[triggered_index]
 
 
-# The "Submit" button is handled in history_callback.py
+# The "Save The Prompt" button is handled in history_callback.py

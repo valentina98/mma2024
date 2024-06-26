@@ -19,7 +19,7 @@ def create_input():
                     )
                 ]),
                 dbc.Row([
-                    dbc.Col(dbc.Button('Save', id='save-button', color='primary', className='pe-button'), width='auto', style={'margin-left': 'auto'}),
+                    dbc.Col(dbc.Button('Submit Prompt', id='submit-button', color='primary', className='pe-button'), width='auto', style={'margin-left': 'auto'}),
                 ]),
                 dbc.Row([
                     html.Label('Code and Chart:', className='label'),
@@ -27,11 +27,11 @@ def create_input():
                         id="loading-answer",
                         className='dash-loading',
                         type="circle",
-                        children=dcc.Textarea(id='answer-input', className='dash-textarea', style={'height': '200px'}, placeholder='Answer will be displayed here...')
+                        children=dcc.Textarea(id='answer-input', className='dash-textarea', placeholder='Answer will be displayed here...')
                     )
                 ]),
                 dbc.Row([
-                    dbc.Col(dbc.Button('Submit', id='submit-button', color='success', className='pe-button'), width='auto', style={'margin-left': 'auto'})
+                    dbc.Col(dbc.Button('Save Chart', id='save-button', color='success', className='pe-button'), width='auto', style={'margin-left': 'auto'})
                 ]),
             ], width=3),
             dbc.Col([
