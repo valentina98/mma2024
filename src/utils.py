@@ -10,6 +10,7 @@ from openai import OpenAI
 from cleanlab_studio import Studio
 from dotenv import load_dotenv
 import ast
+from src import config
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -18,23 +19,19 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv()
 
-# Initialize clients based on environment variables
-USE_OPEN_AI = os.getenv("USE_OPEN_AI", "false").lower() == "true"
-CALCULATE_SCORES = os.getenv("CALCULATE_SCORES", "false").lower() == "true"
 openai_client = None
 tlm_client = None
 
-if USE_OPEN_AI:
+if config.USE_OPEN_AI == "true":
     openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-if not USE_OPEN_AI or CALCULATE_SCORES:
+if not config.USE_OPEN_AI == "true" or config.CALCULATE_SCORES == "true":
     studio = Studio(api_key=os.environ.get("TLM_API_KEY"))
     tlm_client = studio.TLM()
 
 
 def get_dataset_path(dataset_name):
-    base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../dataset/ourdata'))
-    return os.path.join(base_path, f'{dataset_name}.csv')
+    return os.path.join(config.DATA_PATH, f'{dataset_name}.csv')
 
 
 def load_dataset(dataset_name):
@@ -45,7 +42,7 @@ def load_dataset(dataset_name):
 
 
 def send_prompt(client, prompt, max_tokens):
-    if USE_OPEN_AI:
+    if config.USE_OPEN_AI == "true":
         logger.info(f"Sending prompt to OpenAI: {prompt}")
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
@@ -74,7 +71,7 @@ def get_code(prompt, df, dataset_name):
     )
 
     try: 
-        response = send_prompt(openai_client if USE_OPEN_AI else tlm_client, code_prompt, 150)
+        response = send_prompt(openai_client if config.USE_OPEN_AI == "true" else tlm_client, code_prompt, 150)
 
         # Match the code between ```python and ``` in the response or return the full response
         code = response.split("```python")[1].split("```")[0].strip() if "```python" in response else response.strip()
@@ -84,7 +81,7 @@ def get_code(prompt, df, dataset_name):
         return e
 
 def get_trustworthiness_score(prompt):
-    if CALCULATE_SCORES:
+    if config.CALCULATE_SCORES == "true":
         return tlm_client.prompt(prompt)["trustworthiness_score"]
     return ""
 
@@ -99,7 +96,7 @@ def get_suggestions(prompt):
         f"Prompt: {prompt}"
     )
 
-    suggestions_response = send_prompt(openai_client if USE_OPEN_AI else tlm_client, improvement_prompt, 100)
+    suggestions_response = send_prompt(openai_client if config.USE_OPEN_AI == "true" else tlm_client, improvement_prompt, 100)
     try:
         return ast.literal_eval(suggestions_response)
     except Exception as e:
