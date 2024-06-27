@@ -1,5 +1,6 @@
+import dash
+from dash import dcc, html
 import plotly.graph_objs as go
-from dash import html, dcc
 
 class PromptHistoryPlotter:
     def __init__(self):
@@ -48,13 +49,9 @@ class PromptHistoryPlotter:
 
         return fig
 
-    def plot_collapsed(self, fig, prompt, selected_suggestion, step):
+    def plot_collapsed(self, fig, prompt, suggestion1, suggestion2, suggestion3, selected_suggestion, step):
         initial_prompt_relevance = prompt
         selected_suggestion_relevance = selected_suggestion
-
-        if initial_prompt_relevance is None or selected_suggestion_relevance is None:
-            return fig
-
         low = min(initial_prompt_relevance, selected_suggestion_relevance)
         high = max(initial_prompt_relevance, selected_suggestion_relevance)
         
@@ -84,54 +81,11 @@ class PromptHistoryPlotter:
 
         return fig
 
-    def plot_intermediate(self, step, suggestions, selected_suggestion):
+    def plot_intermediate(self, step, suggestions):
         fig = go.Figure()
 
         for idx, (prev_prompt, _, selected) in enumerate(self.history):
-            fig = self.plot_collapsed(fig, prev_prompt, selected, idx)
-
-        fig = self.plot_collapsed(fig, self.history[-1][0], selected_suggestion, step - 1)
-
-        fig.add_trace(go.Scatter(
-            x=[step + 0.75, step + 1.25],
-            y=[suggestions[0], suggestions[0]],
-            mode='lines',
-            line=dict(color='yellow', width=4),
-            name='Suggestion 1'
-        ))
-        fig.add_trace(go.Scatter(
-            x=[step + 1.75, step + 2.25],
-            y=[suggestions[1], suggestions[1]],
-            mode='lines',
-            line=dict(color='pink', width=4),
-            name='Suggestion 2'
-        ))
-        fig.add_trace(go.Scatter(
-            x=[step + 2.75, step + 3.25],
-            y=[suggestions[2], suggestions[2]],
-            mode='lines',
-            line=dict(color='blue', width=4),
-            name='Suggestion 3'
-        ))
-
-        fig.update_layout(
-            xaxis=dict(
-                tickvals=list(range(step + 4)),
-                ticktext=[f'Prompt {i+1}' for i in range(step)] + [f'Suggestion {i}' for i in range(1, 4)]
-            ),
-            yaxis=dict(range=[0, 1]),
-            showlegend=False
-        )
-
-        return fig
-
-    def plot_final(self, step, suggestions, selected_suggestion):
-        fig = go.Figure()
-
-        for idx, (prev_prompt, _, selected) in enumerate(self.history):
-            fig = self.plot_collapsed(fig, prev_prompt, selected, idx)
-
-        fig = self.plot_collapsed(fig, self.history[-1][0], selected_suggestion, step - 1)
+            fig = self.plot_collapsed(fig, prev_prompt, *self.history[idx][1], selected, idx)
 
         fig.add_trace(go.Scatter(
             x=[step + 0.75, step + 1.25],
@@ -166,6 +120,47 @@ class PromptHistoryPlotter:
 
         return fig
 
+    def plot_final(self, step, suggestions, selected_suggestion):
+        fig = go.Figure()
+
+        for idx, (prev_prompt, _, selected) in enumerate(self.history):
+            fig = self.plot_collapsed(fig, prev_prompt, *self.history[idx][1], selected, idx)
+
+        fig = self.plot_collapsed(fig, self.history[-1][0], *suggestions, selected_suggestion, step)
+
+        fig.add_trace(go.Scatter(
+            x=[step + 0.75, step + 1.25],
+            y=[suggestions[0], suggestions[0]],
+            mode='lines',
+            line=dict(color='yellow', width=4),
+            name='Suggestion 1'
+        ))
+        fig.add_trace(go.Scatter(
+            x=[step + 1.75, step + 2.25],
+            y=[suggestions[1], suggestions[1]],
+            mode='lines',
+            line=dict(color='pink', width=4),
+            name='Suggestion 2'
+        ))
+        fig.add_trace(go.Scatter(
+            x=[step + 2.75, step + 3.25],
+            y=[suggestions[2], suggestions[2]],
+            mode='lines',
+            line=dict(color='blue', width=4),
+            name='Suggestion 3'
+        ))
+
+        fig.update_layout(
+            xaxis=dict(
+                tickvals=list(range(step + 5)),
+                ticktext=[f'Prompt {i+1}' for i in range(step + 2)] + [f'Suggestion {i}' for i in range(1, 4)]
+            ),
+            yaxis=dict(range=[0, 1]),
+            showlegend=False
+        )
+
+        return fig
+
     def plot_sequence(self, initial_prompt, initial_suggestions, subsequent_suggestions_and_selections):
         fig = self.plot_initial(initial_prompt, *initial_suggestions)
         
@@ -174,7 +169,7 @@ class PromptHistoryPlotter:
         for step, (suggestions, selected_suggestion) in enumerate(subsequent_suggestions_and_selections, start=1):
             previous_prompt = self.history[-1][2] if self.history[-1][2] is not None else initial_prompt
             self.history[-1] = (previous_prompt, self.history[-1][1], selected_suggestion)
-            fig = self.plot_intermediate(step, suggestions, selected_suggestion)
+            fig = self.plot_intermediate(step, suggestions)
             self.history.append((selected_suggestion, suggestions, selected_suggestion))
             fig = self.plot_final(step, suggestions, selected_suggestion)
 
@@ -183,4 +178,20 @@ class PromptHistoryPlotter:
 def create_prompt_history_chart(initial_prompt, initial_suggestions, subsequent_suggestions_and_selections):
     plotter = PromptHistoryPlotter()
     fig = plotter.plot_sequence(initial_prompt, initial_suggestions, subsequent_suggestions_and_selections)
-    return html.Div(dcc.Graph(figure=fig), id='custom-ohlc-chart')
+    return html.Div(dcc.Graph(figure=fig), id = 'custom-ohlc-chart')
+
+def create_placeholder_chart():
+    plotter = PromptHistoryPlotter()
+    fig = plotter.plot_initial(0.8, 0.2, 0.4, 0.6)
+    return html.Div(dcc.Graph(figure=fig), id= 'initial-chart-store')
+
+def create_second_placeholder_chart():
+    plotter = PromptHistoryPlotter()
+    initial_prompt = 0.8
+    initial_suggestions = [0.2, 0.4, 0.6]
+    subsequent_suggestions_and_selections = [
+        ([0.5, 0.7, 0.9], 0.6),
+        ([0.1, 0.3, 0.95], 0.9)
+    ]
+    fig = plotter.plot_sequence(initial_prompt, initial_suggestions, subsequent_suggestions_and_selections)
+    return html.Div(dcc.Graph(figure=fig))

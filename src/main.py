@@ -3,7 +3,9 @@ import dash_bootstrap_components as dbc
 from src import config
 from src.widgets import dataset_selection_widget, help_popup_widget, history_widget, prompt_engineering_widget
 from src.widgets import prompt_history_plotter_widget
+from src.widgets import dataset_selection_widget, help_popup_widget, history_widget, prompt_engineering_widget
 from src.callbacks import dataset_callback, history_callback, prompt_engineering_callback, uncertainty_callback
+from src.widgets.ohlc_chart_widget import create_prompt_history_chart
 
 def run_ui():
     external_stylesheets = [dbc.themes.BOOTSTRAP]
@@ -14,6 +16,7 @@ def run_ui():
     deleted_history_store = dcc.Store(id='deleted-history-store', data=[])  # Store to keep track of deleted entries
 
     # Replace OHLC chart widget with the new prompt history plotter widget
+    # help_popup_widget = help_popup_widget.create_help_popup() # ToDo: Implement help_popup
     initial_prompt = 0.8
     initial_suggestions = [0.2, 0.4, 0.6]
     subsequent_suggestions_and_selections = [
@@ -22,6 +25,7 @@ def run_ui():
     ]
     prompt_history_chart = prompt_history_plotter_widget.create_prompt_history_chart(
         initial_prompt, initial_suggestions, subsequent_suggestions_and_selections)
+    ohls_chart_widget = create_prompt_history_chart(initial_prompt, initial_suggestions, subsequent_suggestions_and_selections)
 
     tabs = dcc.Tabs([
         dcc.Tab(label='Dataset Selection', children=[
