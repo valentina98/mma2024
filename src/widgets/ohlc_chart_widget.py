@@ -48,18 +48,20 @@ class PromptHistoryPlotter:
 
         return fig
 
-    def plot_collapsed(self, fig, prompt, selected_suggestion, step):
+    def plot_collapsed(self, fig, prompt, suggestion1, suggestion2, suggestion3, selected_suggestion, step):
         initial_prompt_relevance = prompt
         selected_suggestion_relevance = selected_suggestion
 
         if initial_prompt_relevance is None or selected_suggestion_relevance is None:
             return fig
 
-        low = min(initial_prompt_relevance, selected_suggestion_relevance)
-        high = max(initial_prompt_relevance, selected_suggestion_relevance)
+        suggestions = [suggestion1, suggestion2, suggestion3]
+        low = min(suggestions)
+        high = max(suggestions)
         
         color = 'green' if selected_suggestion_relevance > initial_prompt_relevance else 'red'
 
+        # Add vertical bar from lowest to highest suggestion score
         fig.add_trace(go.Scatter(
             x=[step, step],
             y=[low, high],
@@ -67,6 +69,25 @@ class PromptHistoryPlotter:
             line=dict(color=color, width=4),
             name=f'Prompt {step + 1} Vertical'
         ))
+
+        # Add dotted line if prompt is outside the suggestion range
+        if initial_prompt_relevance < low:
+            fig.add_trace(go.Scatter(
+                x=[step, step],
+                y=[initial_prompt_relevance, low],
+                mode='lines',
+                line=dict(color=color, width=2, dash='dot'),
+                name=f'Prompt {step + 1} Dotted Low'
+            ))
+        elif initial_prompt_relevance > high:
+            fig.add_trace(go.Scatter(
+                x=[step, step],
+                y=[high, initial_prompt_relevance],
+                mode='lines',
+                line=dict(color=color, width=2, dash='dot'),
+                name=f'Prompt {step + 1} Dotted High'
+            ))
+
         fig.add_trace(go.Scatter(
             x=[step - 0.25, step],
             y=[initial_prompt_relevance, initial_prompt_relevance],
@@ -84,13 +105,14 @@ class PromptHistoryPlotter:
 
         return fig
 
+
     def plot_intermediate(self, step, suggestions, selected_suggestion):
         fig = go.Figure()
 
-        for idx, (prev_prompt, _, selected) in enumerate(self.history):
-            fig = self.plot_collapsed(fig, prev_prompt, selected, idx)
+        for idx, (prev_prompt, suggestion_scores, selected) in enumerate(self.history):
+            fig = self.plot_collapsed(fig, prev_prompt, suggestion_scores[0], suggestion_scores[1], suggestion_scores[2], selected, idx)
 
-        fig = self.plot_collapsed(fig, self.history[-1][0], selected_suggestion, step - 1)
+        fig = self.plot_collapsed(fig, self.history[-1][0], suggestions[0], suggestions[1], suggestions[2], selected_suggestion, step - 1)
 
         fig.add_trace(go.Scatter(
             x=[step + 0.75, step + 1.25],
@@ -128,10 +150,10 @@ class PromptHistoryPlotter:
     def plot_final(self, step, suggestions, selected_suggestion):
         fig = go.Figure()
 
-        for idx, (prev_prompt, _, selected) in enumerate(self.history):
-            fig = self.plot_collapsed(fig, prev_prompt, selected, idx)
+        for idx, (prev_prompt, suggestion_scores, selected) in enumerate(self.history):
+            fig = self.plot_collapsed(fig, prev_prompt, suggestion_scores[0], suggestion_scores[1], suggestion_scores[2], selected, idx)
 
-        fig = self.plot_collapsed(fig, self.history[-1][0], selected_suggestion, step - 1)
+        fig = self.plot_collapsed(fig, self.history[-1][0], suggestions[0], suggestions[1], suggestions[2], selected_suggestion, step - 1)
 
         fig.add_trace(go.Scatter(
             x=[step + 0.75, step + 1.25],
@@ -165,6 +187,7 @@ class PromptHistoryPlotter:
         )
 
         return fig
+
 
     def plot_sequence(self, initial_prompt, initial_suggestions, subsequent_suggestions_and_selections):
         fig = self.plot_initial(initial_prompt, *initial_suggestions)
