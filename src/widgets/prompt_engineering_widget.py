@@ -52,14 +52,23 @@ def create_input():
         ]),
     ], fluid=True)
 
-def create_main_chart(code, dataset_name):
+def create_prompt_chart(code, dataset_name):
     fig = generate_chart(code, dataset_name)
     return html.Div(children=dcc.Graph(figure=fig, id="main-chart"), id='main-chart-container')
 
-def create_score_span(score):
+def create_prompt_score_span(score):
     if score and isinstance(score, float):
         score = round(score, 3)
-    return html.Span(f"({score})", className='suggestion-score')
+        return html.Span(f"({score})", className='suggestion-score')
+    else: 
+        return html.Span(f"", className='suggestion-score')
+
+def create_suggestion_score_span(score, index):
+    if score and isinstance(score, float):
+        score = round(score, 3)
+        return html.Span(f"({score})", id={'type': 'suggestion-score', 'index': index}, className='suggestion-score')
+    else:
+        return html.Span(f"", id={'type': 'suggestion-score', 'index': index}, className='suggestion-score')
 
 def create_suggestion(suggestion_prompt, index):
     return html.Button(suggestion_prompt, id={'type': 'suggestion-button', 'index': index}, n_clicks=0, className='suggestion-button')
@@ -72,7 +81,7 @@ def create_suggestion_chart(fig, index):
 def create_suggestions(suggestions, dataset_name):
     return [
         html.Div([
-            create_score_span(suggestion_score),
+            create_suggestion_score_span(suggestion_score, i),
             dcc.Loading(
                 id={'type': 'loading-suggestion', 'index': i},
                 className='dash-loading',
