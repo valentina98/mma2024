@@ -11,6 +11,7 @@ from cleanlab_studio import Studio
 from dotenv import load_dotenv
 import ast
 from src import config
+import random
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -84,7 +85,9 @@ def get_trustworthiness_score(prompt):
         trustworthiness_score = tlm_client.prompt(prompt)["trustworthiness_score"]
         logger.info(f"Trustworthiness score: {trustworthiness_score}")
         return trustworthiness_score
-    return ""
+    else:
+        # Return a value berween 0 and 1
+        return random.random()
 
 
 def get_suggestions(prompt, dataset_name):
