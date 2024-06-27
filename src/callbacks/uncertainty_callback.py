@@ -6,7 +6,7 @@ from src.widgets.ohlc_chart_widget import create_prompt_history_chart
 history = []
 
 @callback(
-    Output('custom-ohlc-chart', 'children'),
+    Output('ohls-chart', 'children', allow_duplicate = True),  # Change this line to update the correct div
     Input('save-button', 'n_clicks'),
     State('prompt-score', 'children'),
     State({'type': 'suggestion-score', 'index': ALL}, 'children'),
