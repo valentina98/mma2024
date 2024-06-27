@@ -27,20 +27,17 @@ def initialize_placeholder_2():
 app = Dash(__name__)
 
 @callback(
-    Output('custom-ohlc-chart', 'children', allow_duplicate=True),
+    [Output('custom-ohlc-chart', 'children', allow_duplicate=True),
     Output('initial-chart-store', 'data', allow_duplicate=True),
-    Output('placeholder-buttons', 'style'),
+    Output('placeholder-buttons', 'style')],
+    Input('save-button', 'n_clicks'),
     State('prompt-score', 'children'),
     State({'type': 'suggestion-score', 'index': ALL}, 'children'),
-    Input('save-button', 'n_clicks'),
     State('initial-chart-store', 'data'),
     prevent_initial_call=True
 )
 def save_clicked_update_custom_ohlc(save_n_clicks, prompt_score, suggestion_scores, initial_chart_present):
     global history
-
-    if not ctx.triggered:
-        return no_update, no_update, no_update
     
     logger.info(f"Handling manage the custom OHLC: {save_n_clicks}, prompt_score: {prompt_score}, suggestion_scores: {suggestion_scores}")
     
