@@ -25,7 +25,7 @@ tlm_client = None
 if config.USE_OPEN_AI == "true":
     openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-if not config.USE_OPEN_AI == "true" or config.CALCULATE_SCORES == "true":
+if not config.USE_OPEN_AI == "true" or config.CALCULATE_SCORES == "true": # ToDo: True
     studio = Studio(api_key=os.environ.get("TLM_API_KEY"))
     tlm_client = studio.TLM()
 
@@ -58,7 +58,8 @@ def send_prompt(client, prompt, max_tokens):
         return client.prompt(prompt)["response"]
 
 
-def get_code(prompt, df, dataset_name):
+def get_code(prompt, dataset_name):
+    df = load_dataset(dataset_name)
     code_prompt = (
         f"Dataset: {dataset_name}\n\nContext: {df.head(2).to_string(index=False)}\n\nPrompt: "
         "You are an AI that strictly conforms to responses in Python code. "
@@ -69,24 +70,26 @@ def get_code(prompt, df, dataset_name):
         f"{prompt}"
         "Provide only Python code, do not give any reaction other than the code itself, no yapping, no certainly, no nothing like strings, only the code. "
     )
-
     try: 
         response = send_prompt(openai_client if config.USE_OPEN_AI == "true" else tlm_client, code_prompt, 150)
-
         # Match the code between ```python and ``` in the response or return the full response
         code = response.split("```python")[1].split("```")[0].strip() if "```python" in response else response.strip()
-
+        logger.info(f"Code received: {code}")
         return code
     except Exception as e:
         return e
 
 def get_trustworthiness_score(prompt):
     if config.CALCULATE_SCORES == "true":
-        return tlm_client.prompt(prompt)["trustworthiness_score"]
+        trustworthiness_score = tlm_client.prompt(prompt)["trustworthiness_score"]
+        logger.info(f"Trustworthiness score: {trustworthiness_score}")
+        return trustworthiness_score
     return ""
 
 
-def get_suggestions(prompt):
+def get_suggestions(prompt, dataset_name):
+    df = load_dataset(dataset_name)
+    # ToDo: Add 2 lines from the dataset in the suggestion prompt?
     improvement_prompt = (
         "An LLM will be provided with the following prompt and a dataset. "
         "Your goal is to improve the prompt so that the LLM returns a more accurate response. "
@@ -95,38 +98,15 @@ def get_suggestions(prompt):
         "Example response: ['Plot a bar chart', 'Generate a pie chart', 'Plot a visualization'] "
         f"Prompt: {prompt}"
     )
-
     suggestions_response = send_prompt(openai_client if config.USE_OPEN_AI == "true" else tlm_client, improvement_prompt, 100)
-    try:
-        return ast.literal_eval(suggestions_response)
-    except Exception as e:
-        return e
-
-
-def get_code_and_suggestions(prompt, dataset_name):
-
-    try:
-        df = load_dataset(dataset_name)
-
-        code = get_code(prompt, df, dataset_name)
-        logger.info(f"Code received: {code}")
-
-        trustworthiness_score = get_trustworthiness_score(prompt)
-        logger.info(f"Trustworthiness score: {trustworthiness_score}")
-
-        suggestions_array = get_suggestions(prompt)
-        suggestions = []
-        for suggestion in suggestions_array:
-            suggestion_code = get_code(suggestion, df, dataset_name)
-            suggestion_trustworthiness_score = get_trustworthiness_score(suggestion)
-            suggestions.append((suggestion, suggestion_trustworthiness_score, suggestion_code))
-            logger.info(f"Suggestion code received: {suggestion_code}")
-
-        return code, trustworthiness_score, suggestions
-
-    except Exception as e:
-        logger.exception(f"Error getting suggestions: {e}")
-        return "", "", []
+    suggestions_array = ast.literal_eval(suggestions_response)
+    suggestions = []
+    for suggestion in suggestions_array:
+        suggestion_code = get_code(suggestion, dataset_name)
+        suggestion_trustworthiness_score = get_trustworthiness_score(suggestion)
+        suggestions.append((suggestion, suggestion_trustworthiness_score, suggestion_code))
+        logger.info(f"Suggestion code received: {suggestion_code}")
+    return suggestions
 
 
 def generate_chart(code_str, dataset_name):
