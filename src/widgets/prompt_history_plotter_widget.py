@@ -183,7 +183,7 @@ def create_prompt_history_chart(initial_prompt, initial_suggestions, subsequent_
 def create_placeholder_chart():
     plotter = PromptHistoryPlotter()
     fig = plotter.plot_initial(0.8, 0.2, 0.4, 0.6)
-    return html.Div(dcc.Graph(figure=fig), id= 'initial-chart-store')
+    return html.Div(dcc.Graph(figure=fig))
 
 def create_second_placeholder_chart():
     plotter = PromptHistoryPlotter()
