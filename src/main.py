@@ -5,6 +5,8 @@ from src.widgets import dataset_selection_widget, help_popup_widget, history_wid
 from src.widgets import prompt_history_plotter_widget
 from src.callbacks import dataset_callback, history_callback, prompt_engineering_callback, uncertainty_callback
 
+app = uncertainty_callback.app  # Import the app from the callback module
+
 def run_ui():
     external_stylesheets = [dbc.themes.BOOTSTRAP]
     app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
