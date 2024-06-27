@@ -66,7 +66,7 @@ def create_prompt_score_span(score):
         score = round(score, 3)
         return html.Span(f"({score})", className='suggestion-score')
     else: 
-        return html.Span(f"", className='suggestion-score')
+        return html.Span(score, className='suggestion-score')
 
 def create_suggestion_score_span(score, index):
     if score and isinstance(score, float):
