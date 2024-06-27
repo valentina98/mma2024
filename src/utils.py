@@ -22,10 +22,10 @@ load_dotenv()
 openai_client = None
 tlm_client = None
 
-if config.USE_OPEN_AI == "true":
+if config.USE_OPEN_AI:
     openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-if not config.USE_OPEN_AI == "true" or config.CALCULATE_SCORES == "true": # ToDo: True
+if not config.USE_OPEN_AI or config.CALCULATE_SCORES:
     studio = Studio(api_key=os.environ.get("TLM_API_KEY"))
     tlm_client = studio.TLM()
 
@@ -42,7 +42,7 @@ def load_dataset(dataset_name):
 
 
 def send_prompt(client, prompt, max_tokens):
-    if config.USE_OPEN_AI == "true":
+    if config.USE_OPEN_AI:
         logger.info(f"Sending prompt to OpenAI: {prompt}")
         response = client.chat.completions.create(
             model=config.OPEN_AI_MODEL,
@@ -71,7 +71,7 @@ def get_code(prompt, dataset_name):
         "Provide only Python code, do not give any reaction other than the code itself, no yapping, no certainly, no nothing like strings, only the code. "
     )
     try: 
-        response = send_prompt(openai_client if config.USE_OPEN_AI == "true" else tlm_client, code_prompt, 150)
+        response = send_prompt(openai_client if config.USE_OPEN_AI else tlm_client, code_prompt, 150)
         # Match the code between ```python and ``` in the response or return the full response
         code = response.split("```python")[1].split("```")[0].strip() if "```python" in response else response.strip()
         logger.info(f"Code received: {code}")
@@ -80,7 +80,7 @@ def get_code(prompt, dataset_name):
         return e
 
 def get_trustworthiness_score(prompt):
-    if config.CALCULATE_SCORES == "true":
+    if config.CALCULATE_SCORES:
         trustworthiness_score = tlm_client.prompt(prompt)["trustworthiness_score"]
         logger.info(f"Trustworthiness score: {trustworthiness_score}")
         return trustworthiness_score
@@ -98,7 +98,7 @@ def get_suggestions(prompt, dataset_name):
         "Example response: ['Plot a bar chart', 'Generate a pie chart', 'Plot a visualization'] "
         f"Prompt: {prompt}"
     )
-    suggestions_response = send_prompt(openai_client if config.USE_OPEN_AI == "true" else tlm_client, improvement_prompt, 100)
+    suggestions_response = send_prompt(openai_client if config.USE_OPEN_AI else tlm_client, improvement_prompt, 100)
     suggestions_array = ast.literal_eval(suggestions_response)
     suggestions = []
     for suggestion in suggestions_array:
