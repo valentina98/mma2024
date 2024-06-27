@@ -29,48 +29,33 @@ def submit_clicked_update_main(n_clicks, prompt, dataset_name):
         return "", "The chart will be displayed here...", popup_error_widget.create_popup_error("Please select a dataset before submitting the prompt.")
 
 
-# Callback to update prompt score when the "Submit The Prompt" button is clicked
+# Callback to update the prompt score and the suggestions when the "Submit The Prompt" button is clicked
 @callback(
-    Output('prompt-score', 'children', allow_duplicate=True),
+    [Output('prompt-score', 'children', allow_duplicate=True),
+     Output('suggestions-container', 'children')],
     Input('submit-button', 'n_clicks'),
     State('prompt-input', 'value'),
     # State('answer-input', 'value'), # ToDo
     State('selected-dataset-store', 'data'),
     prevent_initial_call=True
 )
-def submit_clicked_update_score(n_clicks, prompt, dataset_name):
-    logger.info(f"Handling update score for prompt: {prompt}, n_clicks: {n_clicks}, selected_dataset_store: {dataset_name}")
+def submit_clicked_update_suggestions(n_clicks, prompt, dataset_name):
+    logger.info(f"Handling update score and suggestions for n_clicks: {n_clicks},  prompt: {prompt}, selected_dataset_store: {dataset_name}")
     if dataset_name:
         # Get score for the prompt
+        # trustworthiness_score = get_trustworthiness_score(prompt, code)
         trustworthiness_score = get_trustworthiness_score(prompt)
-
         # Create the score widget
         prompt_score = prompt_engineering_widget.create_prompt_score_span(trustworthiness_score)
         
-        return prompt_score
-
-
-# Callback to update suggestions when the "Submit The Prompt" button is clicked
-@callback(
-    Output('suggestions-container', 'children'),
-    Input('submit-button', 'n_clicks'),
-    State('prompt-input', 'value'),
-    State('selected-dataset-store', 'data'),
-    prevent_initial_call=True
-)
-def submit_clicked_update_suggestions(n_clicks, prompt, dataset_name):
-    logger.info(f"Handling update suggestions for prompt: {prompt}, n_clicks: {n_clicks}, selected_dataset_store: {dataset_name}")
-    if dataset_name:
-        
         # Prompt the llm for the suggestions
         suggestions = get_suggestions(prompt, dataset_name)
-
         # Generate suggestions and charts
         suggestions_list = prompt_engineering_widget.create_suggestions(suggestions, dataset_name)
-        
-        return suggestions_list
+
+        return prompt_score, suggestions_list
     else:
-        return ""
+        return "", ""
 
 
 # Callback when one of the suggestions is selected

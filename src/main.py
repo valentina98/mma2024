@@ -40,23 +40,12 @@ def run_ui():
         html.Div(id='error-popup-container'),
     ], fluid=True, id='container')
 
-    app.run_server(debug=True, use_reloader=False)
+    return app
 
 def main():
-    # if not Dataset.files_exist():
-    #     print('File', config.AUGMENTED_DATASET_PATH, 'missing or file', config.ATTRIBUTE_DATA_PATH, 'missing or directory', config.IMAGES_DIR, 'missing')
-    #     print('Creating dataset.')
-    #     Dataset.download()
-
-    # Dataset.load()
-
-    # if len(Dataset.get()) != config.DATASET_SAMPLE_SIZE:
-    #     print('Sample size changed in the configuration. Recalculating features.')
-    #     Dataset.download()
-    #     Dataset.load()
-
     print('Starting Dash')
-    run_ui()
+    app = run_ui()
+    app.run_server(debug=True, use_reloader=False)
 
 if __name__ == '__main__':
     main()

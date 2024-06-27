@@ -78,10 +78,15 @@ def get_code(prompt, dataset_name):
         logger.info(f"Code received: {code}")
         return code
     except Exception as e:
-        return e
+        logger.error(f"Error getting code: {e}")
+        return str(e)
 
 def get_trustworthiness_score(prompt):
+# def get_trustworthiness_score(prompt, code):
     if config.CALCULATE_SCORES:
+        # ToDo: Try using the full prompt for the code that we passed to the llm
+        # ToDo: Try using the response code from the llm
+        # trustworthiness_score = tlm_client.get_trustworthiness_score(prompt, response=code)
         trustworthiness_score = tlm_client.prompt(prompt)["trustworthiness_score"]
         logger.info(f"Trustworthiness score: {trustworthiness_score}")
         return trustworthiness_score
@@ -91,7 +96,7 @@ def get_trustworthiness_score(prompt):
 
 
 def get_suggestions(prompt, dataset_name):
-    df = load_dataset(dataset_name)
+    # df = load_dataset(dataset_name)
     # ToDo: Add 2 lines from the dataset in the suggestion prompt?
     improvement_prompt = (
         "An LLM will be provided with the following prompt and a dataset. "
@@ -101,12 +106,13 @@ def get_suggestions(prompt, dataset_name):
         "Example response: ['Plot a bar chart', 'Generate a pie chart', 'Plot a visualization'] "
         f"Prompt: {prompt}"
     )
-    suggestions_response = send_prompt(openai_client if config.USE_OPEN_AI else tlm_client, improvement_prompt, 100)
+    suggestions_response = send_prompt(openai_client if config.USE_OPEN_AI else tlm_client, improvement_prompt, 150)
     suggestions_array = ast.literal_eval(suggestions_response)
     suggestions = []
     for suggestion in suggestions_array:
         suggestion_code = get_code(suggestion, dataset_name)
         suggestion_trustworthiness_score = get_trustworthiness_score(suggestion)
+        # suggestion_trustworthiness_score = get_trustworthiness_score(suggestion, suggestion_code)
         suggestions.append((suggestion, suggestion_trustworthiness_score, suggestion_code))
         logger.info(f"Suggestion code received: {suggestion_code}")
     return suggestions
@@ -176,10 +182,3 @@ def generate_chart(code_str, dataset_name):
         )
         
         return fig
-    
-
-# def encode_image(image):
-#     image_base64 = base64.b64encode(image).decode('utf-8')
-#     return f'data:image/png;base64,{image_base64}'
-
-
