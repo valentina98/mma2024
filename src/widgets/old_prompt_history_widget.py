@@ -1,5 +1,6 @@
+import dash
+from dash import dcc, html
 import plotly.graph_objs as go
-from dash import html, dcc
 
 class PromptHistoryPlotter:
     def __init__(self):
@@ -177,4 +178,20 @@ class PromptHistoryPlotter:
 def create_prompt_history_chart(initial_prompt, initial_suggestions, subsequent_suggestions_and_selections):
     plotter = PromptHistoryPlotter()
     fig = plotter.plot_sequence(initial_prompt, initial_suggestions, subsequent_suggestions_and_selections)
-    return html.Div(dcc.Graph(figure=fig), id='custom-ohlc-chart')
+    return html.Div(dcc.Graph(figure=fig), id = 'custom-ohlc-chart')
+
+def create_placeholder_chart():
+    plotter = PromptHistoryPlotter()
+    fig = plotter.plot_initial(0.8, 0.2, 0.4, 0.6)
+    return html.Div(dcc.Graph(figure=fig), id= 'initial-chart-store')
+
+def create_second_placeholder_chart():
+    plotter = PromptHistoryPlotter()
+    initial_prompt = 0.8
+    initial_suggestions = [0.2, 0.4, 0.6]
+    subsequent_suggestions_and_selections = [
+        ([0.5, 0.7, 0.9], 0.6),
+        ([0.1, 0.3, 0.95], 0.9)
+    ]
+    fig = plotter.plot_sequence(initial_prompt, initial_suggestions, subsequent_suggestions_and_selections)
+    return html.Div(dcc.Graph(figure=fig))
