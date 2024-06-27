@@ -1,6 +1,10 @@
-from dash import callback, Output, Input, State, no_update, ctx
+from dash import callback, Output, Input, State, no_update, ctx, html, dcc
 from dash.dependencies import ALL
 from utils import logger
+from src.widgets import prompt_history_plotter_widget
+
+# Store the history globally
+history = []
 
 @callback(
     Output('custom-ohlc-chart', 'children'),
@@ -10,19 +14,24 @@ from utils import logger
     prevent_initial_call=True
 )
 def save_clicked_update_custom_ohlc(save_n_clicks, prompt_score, suggestion_scores):
+    global history
     
     if not ctx.triggered:
         return no_update
     
     logger.info(f"Handling manage the custom OHLC: {save_n_clicks}, prompt_score: {prompt_score}, suggestion_scores: {suggestion_scores}")
-    # INFO:utils:Handling manage the custom OHLC: 1, prompt_score: {'props': {'children': '(0.638)', 'className': 'suggestion-score'}, 'type': 'Span', 'namespace': 'dash_html_components'}, suggestion_scores: ['(0.327)', '(0.007)', '(0.07)']
-
-    # logger.info(f"prompt_score: {prompt_score.get(props)children}")
-    # logger.info(f"suggestion_scores: {suggestion_scores}")
     
-    # initial_prompt = 0.8
-    # initial_suggestions = [0.2, 0.4, 0.6]
-    # subsequent_suggestions_and_selections = [
-    #     ([0.5, 0.7, 0.9], 0.6),
-    #     ([0.1, 0.3, 0.95], 0.9)
-    # ]
+    # Convert scores to float
+    prompt_score = float(prompt_score)
+    suggestion_scores = [float(score) for score in suggestion_scores]
+    
+    # Append the current scores to the history
+    history.append((prompt_score, suggestion_scores, suggestion_scores[0]))  # Assuming first suggestion is selected
+
+    # Generate the new plot using the updated history
+    plotter = prompt_history_plotter_widget.PromptHistoryPlotter()
+    initial_prompt, initial_suggestions, _ = history[0]
+    subsequent_suggestions_and_selections = [(sug, sel) for _, sug, sel in history[1:]]
+    fig = plotter.plot_sequence(initial_prompt, initial_suggestions, subsequent_suggestions_and_selections)
+    
+    return html.Div(dcc.Graph(figure=fig))
