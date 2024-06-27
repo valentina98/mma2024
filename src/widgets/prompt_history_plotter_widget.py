@@ -1,8 +1,6 @@
-# src/widgets/prompt_history_plotter_widget.py
-
+from dash.dependencies import Input, Output, State
 import dash
 from dash import dcc, html
-from dash.dependencies import Input, Output, State
 import plotly.graph_objs as go
 
 class PromptHistoryPlotter:
@@ -11,10 +9,34 @@ class PromptHistoryPlotter:
 
     def plot_initial(self, prompt, suggestion1, suggestion2, suggestion3):
         fig = go.Figure()
-        fig.add_hline(y=prompt, line_color="maroon", line_width=4, x0=-0.25, x1=0.25)
-        fig.add_hline(y=suggestion1, line_color="yellow", line_width=4, x0=0.75, x1=1.25)
-        fig.add_hline(y=suggestion2, line_color="pink", line_width=4, x0=1.75, x1=2.25)
-        fig.add_hline(y=suggestion3, line_color="blue", line_width=4, x0=2.75, x1=3.25)
+        fig.add_trace(go.Scatter(
+            x=[-0.25, 0.25],
+            y=[prompt, prompt],
+            mode='lines',
+            line=dict(color='maroon', width=4),
+            name='Prompt'
+        ))
+        fig.add_trace(go.Scatter(
+            x=[0.75, 1.25],
+            y=[suggestion1, suggestion1],
+            mode='lines',
+            line=dict(color='yellow', width=4),
+            name='Suggestion 1'
+        ))
+        fig.add_trace(go.Scatter(
+            x=[1.75, 2.25],
+            y=[suggestion2, suggestion2],
+            mode='lines',
+            line=dict(color='pink', width=4),
+            name='Suggestion 2'
+        ))
+        fig.add_trace(go.Scatter(
+            x=[2.75, 3.25],
+            y=[suggestion3, suggestion3],
+            mode='lines',
+            line=dict(color='blue', width=4),
+            name='Suggestion 3'
+        ))
 
         fig.update_layout(
             title='Prompt and Suggestions',
@@ -36,9 +58,27 @@ class PromptHistoryPlotter:
         
         color = 'green' if selected_suggestion_relevance > initial_prompt_relevance else 'red'
 
-        fig.add_vline(x=step, line_color=color, line_width=4, y0=low, y1=high)
-        fig.add_hline(y=initial_prompt_relevance, line_color=color, line_width=4, x0=step-0.25, x1=step)
-        fig.add_hline(y=selected_suggestion_relevance, line_color=color, line_width=4, x0=step, x1=step+0.25)
+        fig.add_trace(go.Scatter(
+            x=[step, step],
+            y=[low, high],
+            mode='lines',
+            line=dict(color=color, width=4),
+            name=f'Prompt {step + 1} Vertical'
+        ))
+        fig.add_trace(go.Scatter(
+            x=[step - 0.25, step],
+            y=[initial_prompt_relevance, initial_prompt_relevance],
+            mode='lines',
+            line=dict(color=color, width=4),
+            name=f'Prompt {step + 1} Left'
+        ))
+        fig.add_trace(go.Scatter(
+            x=[step, step + 0.25],
+            y=[selected_suggestion_relevance, selected_suggestion_relevance],
+            mode='lines',
+            line=dict(color=color, width=4),
+            name=f'Prompt {step + 1} Right'
+        ))
 
         return fig
 
@@ -48,13 +88,31 @@ class PromptHistoryPlotter:
         for idx, (prev_prompt, _, selected) in enumerate(self.history):
             fig = self.plot_collapsed(fig, prev_prompt, *self.history[idx][1], selected, idx)
 
-        fig.add_hline(y=suggestions[0], line_color="yellow", line_width=4, x0=step + 0.75, x1=step + 1.25)
-        fig.add_hline(y=suggestions[1], line_color="pink", line_width=4, x0=step + 1.75, x1=step + 2.25)
-        fig.add_hline(y=suggestions[2], line_color="blue", line_width=4, x0=step + 2.75, x1=step + 3.25)
+        fig.add_trace(go.Scatter(
+            x=[step + 0.75, step + 1.25],
+            y=[suggestions[0], suggestions[0]],
+            mode='lines',
+            line=dict(color='yellow', width=4),
+            name='Suggestion 1'
+        ))
+        fig.add_trace(go.Scatter(
+            x=[step + 1.75, step + 2.25],
+            y=[suggestions[1], suggestions[1]],
+            mode='lines',
+            line=dict(color='pink', width=4),
+            name='Suggestion 2'
+        ))
+        fig.add_trace(go.Scatter(
+            x=[step + 2.75, step + 3.25],
+            y=[suggestions[2], suggestions[2]],
+            mode='lines',
+            line=dict(color='blue', width=4),
+            name='Suggestion 3'
+        ))
 
         fig.update_layout(
             xaxis=dict(
-                tickvals=list(range(step + 4)),  # Convert range to list
+                tickvals=list(range(step + 4)),
                 ticktext=[f'Prompt {i+1}' for i in range(step + 1)] + [f'Suggestion {i}' for i in range(1, 4)]
             ),
             yaxis=dict(range=[0, 1]),
@@ -71,13 +129,31 @@ class PromptHistoryPlotter:
 
         fig = self.plot_collapsed(fig, self.history[-1][0], *suggestions, selected_suggestion, step)
 
-        fig.add_hline(y=suggestions[0], line_color="yellow", line_width=4, x0=step + 0.75, x1=step + 1.25)
-        fig.add_hline(y=suggestions[1], line_color="pink", line_width=4, x0=step + 1.75, x1=step + 2.25)
-        fig.add_hline(y=suggestions[2], line_color="blue", line_width=4, x0=step + 2.75, x1=step + 3.25)
+        fig.add_trace(go.Scatter(
+            x=[step + 0.75, step + 1.25],
+            y=[suggestions[0], suggestions[0]],
+            mode='lines',
+            line=dict(color='yellow', width=4),
+            name='Suggestion 1'
+        ))
+        fig.add_trace(go.Scatter(
+            x=[step + 1.75, step + 2.25],
+            y=[suggestions[1], suggestions[1]],
+            mode='lines',
+            line=dict(color='pink', width=4),
+            name='Suggestion 2'
+        ))
+        fig.add_trace(go.Scatter(
+            x=[step + 2.75, step + 3.25],
+            y=[suggestions[2], suggestions[2]],
+            mode='lines',
+            line=dict(color='blue', width=4),
+            name='Suggestion 3'
+        ))
 
         fig.update_layout(
             xaxis=dict(
-                tickvals=list(range(step + 5)),  # Convert range to list
+                tickvals=list(range(step + 5)),
                 ticktext=[f'Prompt {i+1}' for i in range(step + 2)] + [f'Suggestion {i}' for i in range(1, 4)]
             ),
             yaxis=dict(range=[0, 1]),
