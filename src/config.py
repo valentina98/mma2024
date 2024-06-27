@@ -3,6 +3,7 @@ from pathlib import Path
 
 # llm configuration
 USE_OPEN_AI = 'true'
+OPEN_AI_MODEL = 'gpt-3.5-turbo' # change to 'gpt-4-turbo' for better responses
 CALCULATE_SCORES = 'true'
 # PRECOMPUTE_SUGGESTIONS = 'true'
 

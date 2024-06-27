@@ -45,7 +45,7 @@ def send_prompt(client, prompt, max_tokens):
     if config.USE_OPEN_AI == "true":
         logger.info(f"Sending prompt to OpenAI: {prompt}")
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=config.OPEN_AI_MODEL,
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": prompt}

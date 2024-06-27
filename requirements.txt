@@ -14,3 +14,4 @@ dash-holoniq-wordcloud==0.0.4
 cleanlab-studio==2.0.8
 python-dotenv==1.0.1
 openai
+seaborn
