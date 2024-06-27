@@ -15,15 +15,8 @@ def run_ui():
     full_history_store = dcc.Store(id='full-history-store', data=[])  # Store to keep track of the full history
     deleted_history_store = dcc.Store(id='deleted-history-store', data=[])  # Store to keep track of deleted entries
 
-    # Replace OHLC chart widget with the new prompt history plotter widget
-    initial_prompt = 0.8
-    initial_suggestions = [0.2, 0.4, 0.6]
-    subsequent_suggestions_and_selections = [
-        ([0.5, 0.7, 0.9], 0.6),
-        ([0.65, 0.85, 0.95], 0.9)
-    ]
-    prompt_history_chart = prompt_history_plotter_widget.create_prompt_history_chart(
-        initial_prompt, initial_suggestions, subsequent_suggestions_and_selections)
+    # Placeholder chart
+    prompt_history_chart = prompt_history_plotter_widget.create_placeholder_chart()
 
     tabs = dcc.Tabs([
         dcc.Tab(label='Dataset Selection', children=[
