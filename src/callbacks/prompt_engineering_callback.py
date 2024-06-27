@@ -32,7 +32,7 @@ def submit_clicked_update_main(n_clicks, prompt, dataset_name):
 # Callback to update the prompt score and the suggestions when the "Submit The Prompt" button is clicked
 @callback(
     [Output('prompt-score', 'children', allow_duplicate=True),
-     Output('suggestions-container', 'children')],
+     Output('suggestions-container', 'children', allow_duplicate=True)],
     Input('submit-button', 'n_clicks'),
     State('prompt-input', 'value'),
     # State('answer-input', 'value'), # ToDo
@@ -63,7 +63,8 @@ def submit_clicked_update_suggestions(n_clicks, prompt, dataset_name):
     [Output('prompt-input', 'value'),
      Output('answer-input', 'value', allow_duplicate=True),
      Output('main-chart-container', 'children', allow_duplicate=True),
-     Output('prompt-score', 'children', allow_duplicate=True)],
+     Output('prompt-score', 'children', allow_duplicate=True),
+     Output('suggestions-container', 'children', allow_duplicate=True)],
     Input({'type': 'suggestion-button', 'index': ALL}, 'n_clicks'),
     State({'type': 'suggestion-button', 'index': ALL}, 'children'),
     State({'type': 'suggestion-code', 'index': ALL}, 'children'),
@@ -76,7 +77,7 @@ def suggestion_clicked(n_clicks, suggestions, suggestion_codes, suggestion_score
 
     # Avoid updating the prompt if no suggestion was clicked
     if not any(n_clicks):
-        return no_update, no_update, no_update, no_update
+        return no_update, no_update, no_update, no_update, no_update
 
     # Identify which button was clicked
     triggered_index = ctx.triggered_id['index']
@@ -86,7 +87,7 @@ def suggestion_clicked(n_clicks, suggestions, suggestion_codes, suggestion_score
     new_prompt_chart = prompt_engineering_widget.create_prompt_chart(suggestion_codes[triggered_index], dataset_name)
     new_prompt_score = prompt_engineering_widget.create_prompt_score_span(suggestion_scores[triggered_index])
 
-    return suggestions[triggered_index], suggestion_codes[triggered_index], new_prompt_chart, new_prompt_score
+    return suggestions[triggered_index], suggestion_codes[triggered_index], new_prompt_chart, new_prompt_score, ""
 
 
 # The "Save The Prompt" button is handled in history_callback.py

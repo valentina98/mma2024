@@ -46,7 +46,12 @@ def create_input():
             dbc.Col([
                 html.Div([
                     html.Label('Suggestions:', className='label'),
-                    html.Div(id='suggestions-container', className='suggestions-container'),
+                    dcc.Loading(
+                        id="loading-suggestions",
+                        className='dash-loading',
+                        type="circle",
+                        fullscreen=False,
+                        children=html.Div(id='suggestions-container', className='suggestions-container'))
                 ])
             ], width=4)
         ]),
@@ -82,12 +87,7 @@ def create_suggestions(suggestions, dataset_name):
     return [
         html.Div([
             create_suggestion_score_span(suggestion_score, i),
-            dcc.Loading(
-                id={'type': 'loading-suggestion', 'index': i},
-                className='dash-loading',
-                type="circle",
-                children=create_suggestion(suggestion_prompt, i),
-            ),
+            create_suggestion(suggestion_prompt, i),
             create_suggestion_chart(generate_chart(suggestion_code, dataset_name), i),
             html.Div(hidden=True, children=suggestion_code, id={'type': 'suggestion-code', 'index': i})
         ], className='suggestion-container') for i, (suggestion_prompt, suggestion_score, suggestion_code) in enumerate(suggestions)
