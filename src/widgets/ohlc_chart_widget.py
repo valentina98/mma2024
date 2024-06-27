@@ -13,7 +13,7 @@ def create_ohlc_chart(chart_data):
                       xaxis_title='Date',
                       yaxis_title='Value')
 
-    return html.Div(dcc.Graph(figure=fig))
+    return html.Div(dcc.Graph(figure=fig), id='custom-ohlc-chart')
 
 # Sample data, replace with your actual data source
 chart_data = pd.DataFrame({
