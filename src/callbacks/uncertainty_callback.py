@@ -37,6 +37,9 @@ def save_clicked_update_custom_ohlc(save_n_clicks, prompt_score, suggestion_scor
     if save_n_clicks == 1:
         # Initial plot
         history.append((prompt_value, suggestion_values, None))
+        history.append((prompt_value, suggestion_values, None))
+        history[-1] = (history[-1][0], history[-1][1], prompt_value)
+        history.append((prompt_value, suggestion_values, None))
     else:
         # Intermediate or final plot
         selected_suggestion = prompt_value  # The prompt value is the selected suggestion for the next plot
