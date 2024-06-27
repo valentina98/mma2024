@@ -36,6 +36,7 @@ def run_ui():
         tabs,
         initial_chart_store,
         full_history_store,
+        deleted_history_store,
         html.Div(id='error-popup-container'),
     ], fluid=True, id='container')
 
