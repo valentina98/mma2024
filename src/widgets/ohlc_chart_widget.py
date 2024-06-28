@@ -192,7 +192,22 @@ class PromptHistoryPlotter:
 
         return fig
 
+    def create_empty_chart(self):
+        fig = go.Figure()
+        fig.update_layout(
+            title='No Data',
+            xaxis=dict(
+                tickvals=[],
+                ticktext=[]
+            ),
+            yaxis=dict(range=[0, 1]),
+            showlegend=False
+        )
+        return html.Div(dcc.Graph(figure=fig), id='custom-ohlc-chart')
+
 def create_prompt_history_chart(initial_prompt, initial_suggestions, subsequent_suggestions_and_selections):
     plotter = PromptHistoryPlotter()
+    if initial_prompt is None:
+        return plotter.create_empty_chart()
     fig = plotter.plot_sequence(initial_prompt, initial_suggestions, subsequent_suggestions_and_selections)
     return html.Div(dcc.Graph(figure=fig), id='custom-ohlc-chart')
