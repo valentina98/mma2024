@@ -1,7 +1,5 @@
 import dash_bootstrap_components as dbc
-
 from src import config
-
 
 def create_help_popup():
     return dbc.Modal(

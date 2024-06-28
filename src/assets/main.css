@@ -1,9 +1,32 @@
-.border-widget{
+/* General styles */
+html, body {
+    overflow: clip;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.border-widget {
     border-radius: 0.375rem;
     border: 1px solid #babfc7;
 }
 
+.dash-textarea {
+    width: 100%;
+    height: 150px;
+    resize: none;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 1px solid gray;
+    scrollbar-gutter: stable;
+}
 
+.dash-loading {
+    opacity: 0.5;
+}
+
+/* Header styles */
 #header {
     font-family: sans-serif;
     font-weight: bold;
@@ -16,69 +39,34 @@
     padding-right: 100px;
 }
 
-.tab-content{
+/* Tab styles */
+.tab-content {
     height: 100%;
     display: contents;
 }
 
-.tab-parent{
+.tab-parent {
     height: 100%;
 }
 
-.radio-buttons{
+.radio-buttons {
     font-family: sans-serif;
     font-weight: bold;
     font-size: 20px;
     display: inline;
 }
 
-#left-tab-radio-buttons{
+#left-tab-radio-buttons {
     margin-left: 16px;
 }
 
+/* Main container */
 #container {
     height: 100vh;
     padding: 65px 100px;
 }
 
-#wordcloud {
-    cursor:pointer;
-    height: 100%;
-    width: 100%;
-}
-
-.wordcloud-container{
-    overflow: clip;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.wordcloud-container > div{
-    overflow: clip;
-    height: 100%;
-    max-height: 100%;
-    width: 100%;
-    max-width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#histogram {
-    width: 100%;
-    height: 100%;
-}
-
-#heatmap {
-    position: relative; 
-}
-
-#heatmap-container {
-    overflow: scroll; 
-    position: relative;
-}
-
+/* Main column layout */
 .main-col {
     height: 100%;
     padding: 0;
@@ -97,64 +85,180 @@
     height: 100%;
 }
 
-.gallery{
-    overflow-y: scroll;
-    overflow-x: clip;
+/* Plotly legend toggle */
+/* .legendtoggle {
+    display: none;
 }
 
-.header-button {
-    background-color: white;
-    margin-left: 10px;
+.legendtext {
+    cursor: default;
+} */
+
+/* Prompt engineering widget styles */
+.pe-button {
+    width: 100%;
+    min-width: 150px;
+    padding: 5px;
+    margin: 15px 0 15px 0;
 }
 
-.gallery-image{
-    border: 2px solid #636363;
-    width: 100px;
-    height: 100px;
+.label {
+    font-weight: bold;
+    font-size: 18px;
 }
 
-.gallery-card {
-    cursor:pointer;
+#prompt-score {
+    font-weight: bold;
+    margin-right: 10px;
+    display: inline-block;
 }
 
-.gallery-col {
+#prompt-input {
+    height: 150px;
+}
+
+#answer-input {
+    height: 150px;
+}
+
+#main-chart {
+    width: 500px;
+    height: 500px;
+    resize: none;
+    padding: 10px;
+    scrollbar-gutter: stable;
+    color: gray;
+    font-size: 16px;
+}
+
+#main-chart-container {
+    width: 500px;
+    height: 500px;
+    resize: none;
+    padding: 10px;
+    scrollbar-gutter: stable;
+    color: gray;
+    font-size: 16px;
+    display: flex;
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
     text-align: center;
 }
 
-.gallery-row{
-    padding-bottom: 20px;
-    padding-top: 20px;
+#suggestions-container {
+    height: 450px;
+    padding: 10px;
+    border-radius: 10px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
 }
 
-.gallery-text {
-  color: #656565;
+.suggestion-score {
+    font-weight: bold;
+    margin: 10px;
 }
 
-html, body {
-    overflow: clip;
+.suggestion-button {
+    margin: 5px;
+    border-radius: 10px;
+    border: none;
+    padding: 10px;
+    background-color: #F9F9F9;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.suggestion-chart {
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    margin-left: 10px;
+}
+
+.suggestion-chart-container {
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    margin-left: 10px;
+}
+
+.suggestion-container {
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    background-color: #F9F9F9;
+}
+
+/* History widget styles */
+.history-container {
+    height: 500px;
+    overflow: auto;
+    padding: 10px;
+    border-radius: 10px;
+    scrollbar-gutter: stable;
+}
+
+.history-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.history-entry-content {
+    flex: 1;
+    padding: 10px;
+}
+
+.history-chart {
+    width: 200px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.history-prompt {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    text-align: center;
     height: 100%;
-    margin: 0;
-    padding: 0;
 }
 
-.wc-canvas-hover-label {
-    position: absolute;
-    background-color: rgba(255, 255, 255, 0);
-    color: rgba(0, 0, 0, 0);
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
-    display: none;
+#clear-history-button, #restore-history-button {
+    margin-bottom: 30px
 }
 
-.wc-canvas-hover{
-    border: 1px solid rgba(100, 100, 100, 1);
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
-    display: none;
+.history-button {
+    margin-top: 20px;
+    border-radius: 10px;
 }
 
-/* removes all plot legend toggles*/
-.legendtoggle {
-   display: none;
+.history-error {
+    color: red;
 }
-.legendtext {
-   cursor: default;
+
+/* Scrollbar styles for WebKit browsers (Chrome, Safari) */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
 }
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: lightgrey;
+}
+
+::-webkit-scrollbar-button {
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-position: center;
+}
+
+/* ToDo: fix scrollbar on history page */
