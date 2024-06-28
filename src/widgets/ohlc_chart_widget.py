@@ -48,25 +48,30 @@ class PromptHistoryPlotter:
 
         return fig
 
-    def plot_collapsed(self, fig, prompt, selected_suggestion, step):
+    def plot_collapsed(self, fig, prompt, suggestions, selected_suggestion, step):
         initial_prompt_relevance = prompt
         selected_suggestion_relevance = selected_suggestion
 
         if initial_prompt_relevance is None or selected_suggestion_relevance is None:
             return fig
 
-        low = min(initial_prompt_relevance, selected_suggestion_relevance)
-        high = max(initial_prompt_relevance, selected_suggestion_relevance)
-        
+        # Calculate the vertical line range
+        low = min(suggestions + [selected_suggestion_relevance])
+        high = max(suggestions + [selected_suggestion_relevance])
+
         color = 'green' if selected_suggestion_relevance > initial_prompt_relevance else 'red'
+        line_dash = 'solid'
+        if selected_suggestion_relevance > high or selected_suggestion_relevance < low or initial_prompt_relevance > high or initial_prompt_relevance < low:
+            line_dash = 'dot'
 
         fig.add_trace(go.Scatter(
             x=[step, step],
             y=[low, high],
             mode='lines',
-            line=dict(color=color, width=4),
+            line=dict(color=color, width=4, dash=line_dash),
             name=f'Prompt {step + 1} Vertical'
         ))
+
         fig.add_trace(go.Scatter(
             x=[step - 0.25, step],
             y=[initial_prompt_relevance, initial_prompt_relevance],
@@ -74,6 +79,7 @@ class PromptHistoryPlotter:
             line=dict(color=color, width=4),
             name=f'Prompt {step + 1} Left'
         ))
+
         fig.add_trace(go.Scatter(
             x=[step, step + 0.25],
             y=[selected_suggestion_relevance, selected_suggestion_relevance],
@@ -87,11 +93,14 @@ class PromptHistoryPlotter:
     def plot_intermediate(self, step, suggestions, selected_suggestion):
         fig = go.Figure()
 
-        for idx, (prev_prompt, _, selected) in enumerate(self.history):
-            fig = self.plot_collapsed(fig, prev_prompt, selected, idx)
+        # Plot all previous collapsed prompts
+        for idx, (prev_prompt, suggestion_scores, selected) in enumerate(self.history):
+            fig = self.plot_collapsed(fig, prev_prompt, suggestion_scores, selected, idx)
 
-        fig = self.plot_collapsed(fig, self.history[-1][0], selected_suggestion, step - 1)
+        # Plot the current collapsed prompt
+        fig = self.plot_collapsed(fig, self.history[-1][0], suggestions, selected_suggestion, step - 1)
 
+        # Plot the new suggestions for the current step
         fig.add_trace(go.Scatter(
             x=[step + 0.75, step + 1.25],
             y=[suggestions[0], suggestions[0]],
@@ -128,11 +137,14 @@ class PromptHistoryPlotter:
     def plot_final(self, step, suggestions, selected_suggestion):
         fig = go.Figure()
 
+        # Plot all previous collapsed prompts
         for idx, (prev_prompt, _, selected) in enumerate(self.history):
-            fig = self.plot_collapsed(fig, prev_prompt, selected, idx)
+            fig = self.plot_collapsed(fig, prev_prompt, self.history[idx][1], selected, idx)
 
-        fig = self.plot_collapsed(fig, self.history[-1][0], selected_suggestion, step - 1)
+        # Plot the current collapsed prompt
+        fig = self.plot_collapsed(fig, self.history[-1][0], suggestions, selected_suggestion, step - 1)
 
+        # Plot the new suggestions for the current step
         fig.add_trace(go.Scatter(
             x=[step + 0.75, step + 1.25],
             y=[suggestions[0], suggestions[0]],
@@ -180,7 +192,22 @@ class PromptHistoryPlotter:
 
         return fig
 
+    def create_empty_chart(self):
+        fig = go.Figure()
+        fig.update_layout(
+            title='No Data',
+            xaxis=dict(
+                tickvals=[],
+                ticktext=[]
+            ),
+            yaxis=dict(range=[0, 1]),
+            showlegend=False
+        )
+        return html.Div(dcc.Graph(figure=fig), id='custom-ohlc-chart')
+
 def create_prompt_history_chart(initial_prompt, initial_suggestions, subsequent_suggestions_and_selections):
     plotter = PromptHistoryPlotter()
+    if initial_prompt is None:
+        return plotter.create_empty_chart()
     fig = plotter.plot_sequence(initial_prompt, initial_suggestions, subsequent_suggestions_and_selections)
     return html.Div(dcc.Graph(figure=fig), id='custom-ohlc-chart')

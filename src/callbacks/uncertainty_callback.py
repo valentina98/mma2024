@@ -9,15 +9,16 @@ history = []
 @callback(
     Output('ohls-chart', 'children', allow_duplicate=True),
     Input('save-button', 'n_clicks'),
+    Input('clear-uncertainty-history-button', 'n_clicks'),
     State('prompt-score', 'children'),
     State({'type': 'suggestion-score', 'index': ALL}, 'children'),
     prevent_initial_call=True
 )
-def save_clicked_update_custom_ohlc(save_n_clicks, prompt_score, suggestion_scores):
+def save_clicked_update_custom_ohlc(save_n_clicks, clear_n_clicks, prompt_score, suggestion_scores):
     global history
-    
-    if not ctx.triggered:
-        return no_update
+    if ctx.triggered_id == 'clear-uncertainty-history-button':
+        history = []
+        return create_prompt_history_chart(None, None, [])
 
     logger.info(f"Handling manage the custom OHLC: {save_n_clicks}, prompt_score: {prompt_score}, suggestion_scores: {suggestion_scores}")
     
@@ -37,11 +38,8 @@ def save_clicked_update_custom_ohlc(save_n_clicks, prompt_score, suggestion_scor
         else:
             suggestion_values.append(0.0)  # Default to 0.0 if empty
 
-    if save_n_clicks == 1:
+    if len(history) == 0:
         # Initial plot
-        history.append((prompt_value, suggestion_values, None))
-        history.append((prompt_value, suggestion_values, None))
-        history[-1] = (history[-1][0], history[-1][1], prompt_value)
         history.append((prompt_value, suggestion_values, None))
     else:
         # Intermediate or final plot
