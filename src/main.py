@@ -24,8 +24,10 @@ def run_ui():
         ]),
         dcc.Tab(label='(Un)certainty Chart', children=[
             html.Div([
-                html.Button('Clear History', id='clear-uncertainty-history-button', n_clicks=0),
-                html.Div(id='ohls-chart', style={'display': 'flex', 'justify-content': 'center', 'align-items': 'center', 'height': '100%'})
+                html.Div(id='ohls-chart', style={'display': 'flex', 'justify-content': 'center', 'align-items': 'center', 'height': '100%'}),
+                html.Div([
+                    dbc.Button('Clear History', id='clear-uncertainty-history-button', className='history-button', color='danger')
+                ], style={'display': 'flex', 'justify-content': 'center', 'marginTop': '20px'})
             ])
         ]),
     ], style={'marginBottom': '20px'})
