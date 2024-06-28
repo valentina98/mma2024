@@ -2,6 +2,8 @@ from dash import dcc, html
 import dash_bootstrap_components as dbc
 from utils import generate_chart
 
+tooltip_message_score = 'A trustworthiness score of the prompt/response'
+
 def create_input():
     return dbc.Container([
         dbc.Row([
@@ -9,7 +11,7 @@ def create_input():
                 dbc.Row([
                     dbc.Col([
                         html.Label('Prompt:', className='label'),
-                        html.Span("", id='prompt-score')
+                        html.Span("", id='prompt-score', title=tooltip_message_score)
                     ], width=12),
                     dcc.Loading(
                         id="loading-prompt",
@@ -64,16 +66,16 @@ def create_prompt_chart(code, dataset_name):
 def create_prompt_score_span(score):
     if score and isinstance(score, float):
         score = round(score, 3)
-        return html.Span(f"({score})", className='suggestion-score')
+        return html.Span(f"({score})", className='suggestion-score', title=tooltip_message_score)
     else: 
-        return html.Span(score, className='suggestion-score')
+        return html.Span(score, className='suggestion-score', title=tooltip_message_score)
 
 def create_suggestion_score_span(score, index):
     if score and isinstance(score, float):
         score = round(score, 3)
-        return html.Span(f"({score})", id={'type': 'suggestion-score', 'index': index}, className='suggestion-score')
+        return html.Span(f"({score})", id={'type': 'suggestion-score', 'index': index}, className='suggestion-score', title=tooltip_message_score)
     else:
-        return html.Span(f"", id={'type': 'suggestion-score', 'index': index}, className='suggestion-score')
+        return html.Span(f"", id={'type': 'suggestion-score', 'index': index}, className='suggestion-score', title=tooltip_message_score)
 
 def create_suggestion(suggestion_prompt, index):
     return html.Button(suggestion_prompt, id={'type': 'suggestion-button', 'index': index}, n_clicks=0, className='suggestion-button')
