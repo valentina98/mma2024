@@ -20,6 +20,7 @@ from utils import generate_chart
      Input('clear-history-button', 'n_clicks'),
      Input('restore-history-button', 'n_clicks')],
     [State('prompt-input', 'value'),
+     State('prompt-score', 'children'),
      State('selected-dataset-store', 'data'),
      State('answer-input', 'value'),
      State('combined-history', 'children'),
@@ -29,7 +30,7 @@ from utils import generate_chart
     prevent_initial_call=True
 )
 def manage_history(save_n_clicks, delete_n_clicks, clear_n_clicks, restore_n_clicks,
-                   prompt_value, selected_dataset_store, answer_input_value, history_children, initial_chart_present, full_history, deleted_history):
+                   prompt_value, prompt_score, selected_dataset_store, answer_input_value, history_children, initial_chart_present, full_history, deleted_history):
     
     if not ctx.triggered:
         return no_update, no_update, no_update, no_update, no_update
@@ -49,7 +50,7 @@ def manage_history(save_n_clicks, delete_n_clicks, clear_n_clicks, restore_n_cli
             # modified_code = answer_input_value.replace("housing", "df") # ToDo: do we need that
             fig = generate_chart(answer_input_value, selected_dataset_store)
 
-            new_entry = create_new_entry(prompt_value, fig, len(full_history))
+            new_entry = create_new_entry(prompt_score, prompt_value, fig, len(full_history))
 
             if initial_chart_present:
                 new_combined_history = [new_entry]
@@ -59,7 +60,7 @@ def manage_history(save_n_clicks, delete_n_clicks, clear_n_clicks, restore_n_cli
                 new_combined_history = [new_entry] + history_children
                 new_full_history = [new_entry] + full_history
         except Exception as e:
-            return no_update, no_update, no_update, no_update, [create_error(str(e))] + history_children
+            return no_update, no_update, no_update, no_update, no_update, [create_error(str(e))] + history_children
         
     # Handle delete button
     if 'delete-button' in triggered_id:

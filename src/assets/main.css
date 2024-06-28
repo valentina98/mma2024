@@ -224,9 +224,15 @@ html, body {
 }
 
 .history-prompt {
-   /* text-align: 'center'; */
-   justify-content: center;
-   align-items: center;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+}
+
+#clear-history-button, #restore-history-button {
+    margin-bottom: 30px
 }
 
 .history-button {

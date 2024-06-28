@@ -1,6 +1,7 @@
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 from src.utils import generate_chart
+from src.widgets.prompt_engineering_widget import create_prompt_score_span
 
 code = '''import matplotlib.pyplot as plt
 
@@ -28,11 +29,12 @@ def create_new_prompt(prompt_value):
 def create_new_chart(fig):
     return html.Div([dcc.Graph(figure=fig, className='history-chart')], className='history-entry-content')
 
-def create_new_entry(prompt_value, fig, full_history_length):
+def create_new_entry(prompt_score, prompt_value, fig, full_history_length):
+    new_prompt_score = create_prompt_score_span(prompt_score)
     new_prompt_div = create_new_prompt(prompt_value)
     new_chart_div = create_new_chart(fig)
     delete_button = create_delete_button({'type': 'delete-button', 'index': full_history_length})
-    return html.Div([new_prompt_div, new_chart_div, delete_button], className='history-entry')
+    return html.Div([new_prompt_score, new_prompt_div, new_chart_div, delete_button], className='history-entry')
 
 def create_error(error_message):
     return html.Div(f"An error occurred while plotting the chart: {error_message}", className='history-error')
